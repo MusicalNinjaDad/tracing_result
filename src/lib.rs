@@ -71,4 +71,14 @@ mod tests {
 
         assert!(no_error().is_ok());
     }
+
+    #[test]
+    fn and_warn_err() {
+        fn err() -> Result<(), ()> {
+            Err(()).and_warn("stuff")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+    }
 }
