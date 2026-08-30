@@ -15,23 +15,23 @@ impl<T, E> Try for TracingResult<T, E> {
     type Residual = TracingResult<!, E>;
 
     fn from_output(output: Self::Output) -> Self {
-        todo!()
+        Self::Ok(output)
     }
 
     fn branch(self) -> std::ops::ControlFlow<Self::Residual, Self::Output> {
-        todo!()
+        todo!("branch")
     }
 }
 
 impl<T, E> FromResidual for TracingResult<T, E> {
     fn from_residual(residual: <Self as Try>::Residual) -> Self {
-        todo!()
+        todo!("from residual")
     }
 }
 
 impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
-        todo!()
+        todo!("from residual for result")
     }
 }
 
@@ -45,7 +45,7 @@ pub trait Trace<T, E> {
 
 impl<T, E> Trace<T, E> for Result<T, E> {
     fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E> {
-        todo!()
+        todo!("and_warn")
     }
 }
 
