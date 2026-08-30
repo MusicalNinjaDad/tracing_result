@@ -22,7 +22,7 @@ impl<T, E> Try for TracingResult<T, E> {
         match self {
             TracingResult::Ok(val) => ControlFlow::Continue(val),
             TracingResult::Err { err, msg } => {
-                tracing::warn!(msg);
+                tracing::warn!("{msg}");
                 ControlFlow::Break(TracingResult::Err { err, msg })
             }
         }
@@ -90,6 +90,7 @@ mod tests {
         }
 
         assert!(err().is_err());
+        assert!(!logs_contain("msg"));
         assert!(logs_contain("stuff"));
     }
 }
