@@ -2,19 +2,64 @@
 #![cfg_attr(unstable_try_trait_v2, feature(try_trait_v2))]
 #![cfg_attr(unstable_try_trait_v2_residual, feature(try_trait_v2_residual))]
 
+use std::ops::{FromResidual, Residual, Try};
+
+pub enum TracingResult<T, E> {
+    Ok(T),
+    Err { err: E, msg: String },
+}
+
+impl<T, E> Try for TracingResult<T, E> {
+    type Output = T;
+
+    type Residual = TracingResult<!, E>;
+
+    fn from_output(output: Self::Output) -> Self {
+        todo!()
+    }
+
+    fn branch(self) -> std::ops::ControlFlow<Self::Residual, Self::Output> {
+        todo!()
+    }
+}
+
+impl<T, E> FromResidual for TracingResult<T, E> {
+    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+        todo!()
+    }
+}
+
+impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
+    fn from_residual(residual: TracingResult<!, E>) -> Self {
+        todo!()
+    }
+}
+
+impl<T, E> Residual<T> for TracingResult<!, E> {
+    type TryType = TracingResult<T, E>;
+}
+
+pub trait Trace<T, E> {
+    fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E>;
+}
+
+impl<T, E> Trace<T, E> for Result<T, E> {
+    fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E> {
+        todo!()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn and_warn_ok {
-
+    fn and_warn_ok() {
         fn no_error() -> Result<(), ()> {
             Ok(()).and_warn("stuff")?;
             Ok(())
         }
 
         assert!(no_error().is_ok());
-
     }
 }
