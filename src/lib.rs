@@ -45,7 +45,10 @@ pub trait Trace<T, E> {
 
 impl<T, E> Trace<T, E> for Result<T, E> {
     fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E> {
-        todo!("and_warn")
+        match self {
+            Ok(val) => TracingResult::Ok(val),
+            Err(err) => TracingResult::Err { err, msg: msg.to_string() },
+        }
     }
 }
 
