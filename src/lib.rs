@@ -2,7 +2,7 @@
 #![cfg_attr(unstable_try_trait_v2, feature(try_trait_v2))]
 #![cfg_attr(unstable_try_trait_v2_residual, feature(try_trait_v2_residual))]
 
-use std::ops::{FromResidual, Residual, Try};
+use std::ops::{ControlFlow, FromResidual, Residual, Try};
 
 pub enum TracingResult<T, E> {
     Ok(T),
@@ -18,8 +18,11 @@ impl<T, E> Try for TracingResult<T, E> {
         Self::Ok(output)
     }
 
-    fn branch(self) -> std::ops::ControlFlow<Self::Residual, Self::Output> {
-        todo!("branch")
+    fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
+        match self {
+            TracingResult::Ok(val) => ControlFlow::Continue(val),
+            TracingResult::Err { err, msg } => ControlFlow::Break(TracingResult::Err { err, msg }),
+        }
     }
 }
 
@@ -47,7 +50,10 @@ impl<T, E> Trace<T, E> for Result<T, E> {
     fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E> {
         match self {
             Ok(val) => TracingResult::Ok(val),
-            Err(err) => TracingResult::Err { err, msg: msg.to_string() },
+            Err(err) => TracingResult::Err {
+                err,
+                msg: msg.to_string(),
+            },
         }
     }
 }
