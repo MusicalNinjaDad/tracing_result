@@ -21,7 +21,10 @@ impl<T, E> Try for TracingResult<T, E> {
     fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
         match self {
             TracingResult::Ok(val) => ControlFlow::Continue(val),
-            TracingResult::Err { err, msg } => ControlFlow::Break(TracingResult::Err { err, msg }),
+            TracingResult::Err { err, msg } => {
+                tracing::warn!(msg);
+                ControlFlow::Break(TracingResult::Err { err, msg })
+            }
         }
     }
 }
