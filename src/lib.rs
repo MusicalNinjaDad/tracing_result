@@ -34,7 +34,9 @@ impl<T, E> FromResidual for TracingResult<T, E> {
 
 impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
-        todo!("from residual for result")
+        match residual {
+            TracingResult::Err { err, msg } => Result::Err(err),
+        }
     }
 }
 
