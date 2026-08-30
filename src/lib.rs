@@ -30,7 +30,7 @@ impl<T, E> Try for TracingResult<T, E> {
 }
 
 impl<T, E> FromResidual for TracingResult<T, E> {
-    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+    fn from_residual(_residual: <Self as Try>::Residual) -> Self {
         todo!("from residual")
     }
 }
@@ -38,7 +38,7 @@ impl<T, E> FromResidual for TracingResult<T, E> {
 impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
         match residual {
-            TracingResult::Err { err, msg } => Result::Err(err),
+            TracingResult::Err { err, .. } => Result::Err(err),
         }
     }
 }
