@@ -1,0 +1,24 @@
+[package]
+name = "tracing_result"
+description = "An ergonomic wrapper making it easy to emit tracing messages on errors."
+categories = ["Rust patterns"]
+keywords = ["tracing"]
+authors = ["Mike Foster <https://github.com/MusicalNinjaDad>"]
+homepage = "https://github.com/MusicalNinjaDad/tracing_result"
+repository = "https://github.com/MusicalNinjaDad/tracing_result"
+readme = "README.md"
+license = "MIT"
+edition = "2024"
+version = "0.1.0"
+
+[dependencies]
+try_v2 = "0.10.1"
+tracing = "0.1"
+
+[dev-dependencies]
+
+[build-dependencies]
+build_safely = "0.5.4"
+
+[workspace.metadata.ninja-xtask]
+env = { "LD_LIBRARY_PATH" = false }
