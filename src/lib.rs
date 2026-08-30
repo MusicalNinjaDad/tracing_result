@@ -62,8 +62,11 @@ impl<T, E> Trace<T, E> for Result<T, E> {
 
 #[cfg(test)]
 mod tests {
+    use tracing_test::traced_test;
+
     use super::*;
 
+    #[traced_test]
     #[test]
     fn and_warn_ok() {
         fn no_error() -> Result<(), ()> {
@@ -72,8 +75,10 @@ mod tests {
         }
 
         assert!(no_error().is_ok());
+        assert!(!logs_contain("stuff"));
     }
 
+    #[traced_test]
     #[test]
     fn and_warn_err() {
         fn err() -> Result<(), ()> {
@@ -82,5 +87,6 @@ mod tests {
         }
 
         assert!(err().is_err());
+        assert!(logs_contain("stuff"));
     }
 }
