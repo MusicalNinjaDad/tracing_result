@@ -23385,17 +23385,7 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "and_warn": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    },
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    }
-  ],
-  "and_trace": [
+  "or_trace": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
@@ -23415,26 +23405,6 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "or_warn": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    },
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    }
-  ],
-  "or_trace": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    },
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    }
-  ],
   "config": [
     {
       "crate": "tracing_result",
@@ -23445,23 +23415,13 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "TracingResult": [
+  "tracing_result": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
     }
   ],
   "Trace": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    }
-  ],
-  "and_debug": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
-    },
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
@@ -23479,13 +23439,53 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "message": [
+  "and_warn": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "tracing_result": [
+  "and_debug": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "and_trace": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "TracingResult": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "or_warn": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "message": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
