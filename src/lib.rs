@@ -17,14 +17,15 @@
 //! # Example
 //!
 //! ```
+//! use std::io;
 //! use tracing_result::{Trace, TracingResult};
 //!
-//! fn might_fail() -> Result<u32, String> {
-//!     Err("something went wrong".to_string())
+//! fn might_fail() -> io::Result<u32> {
+//!     Err(io::Error::other("something went wrong"))
 //! }
 //!
-//! fn compute() -> Result<u32, String> {
-//!     might_fail().and_warn("Failed to compute value")?;
+//! fn compute() -> io::Result<u32> {
+//!     might_fail().or_warn("Failed to compute value")?;
 //!     Ok(42)
 //! }
 //!
@@ -41,6 +42,16 @@ use std::{
     error::Error,
     ops::{ControlFlow, FromResidual, Residual, Try},
 };
+use tracing::Level;
+
+/// Configuration for tracing log level and message.
+#[derive(Debug, Clone, Copy)]
+pub struct TracingConfig {
+    /// The tracing level to use when logging.
+    pub level: Level,
+    /// The message to log.
+    pub message: &'static str,
+}
 
 /// A result type that emits tracing warnings when errors occur.
 ///
@@ -54,25 +65,32 @@ use std::{
 /// # Example
 ///
 /// ```
+/// use std::io;
 /// use tracing_result::{Trace, TracingResult};
 ///
-/// fn divide(a: i32, b: i32) -> Result<i32, String> {
+/// fn divide(a: i32, b: i32) -> io::Result<i32> {
 ///     if b == 0 {
-///         let oops: TracingResult<_, _> = Err("division by zero".to_string())
-///             .and_warn("Cannot divide by zero");
+///         let oops: TracingResult<_, _> = Err(io::Error::other("division by zero"))
+///             .or_warn("Cannot divide by zero");
 ///         oops?;
 ///     }
 ///     Ok(a / b)
 /// }
 /// ```
 pub enum TracingResult<T, E: Error> {
-    /// Success case containing the result value.
-    Ok(T),
-    /// Error case containing both the error and a message to be logged.
+    /// Success case containing the result value and optional tracing configuration.
+    Ok {
+        val: T,
+        config: Option<TracingConfig>,
+    },
+    /// Error case containing both the error and optional tracing configuration.
     ///
-    /// The `msg` field is logged via [`tracing::warn`] when the error
-    /// is propagated using the `?` operator.
-    Err { err: E, name: &'static str },
+    /// If `config` is present, the message is logged at the specified level
+    /// when the error is propagated using the `?` operator.
+    Err {
+        err: E,
+        config: Option<TracingConfig>,
+    },
 }
 
 impl<T, E: Error> Try for TracingResult<T, E> {
@@ -81,39 +99,64 @@ impl<T, E: Error> Try for TracingResult<T, E> {
     type Residual = TracingResult<!, E>;
 
     fn from_output(output: Self::Output) -> Self {
-        Self::Ok(output)
+        Self::Ok {
+            val: output,
+            config: None,
+        }
     }
 
-    /// Executes the `Try` branch operation, **logging error messages on `?``**`.
+    /// Executes the `Try` branch operation, logging messages based on config.
     ///
-    /// When the result is [`Err`], the associated message is logged via [`tracing::warn`]
-    /// and a [`ControlFlow::Break`] is returned with the error. For [`Ok`] values,
-    /// [`ControlFlow::Continue`] is returned with the unwrapped value.
+    /// When the result is [`Ok`] with a config, the message is logged at the specified level.
+    /// When the result is [`Err`] with a config, the message is logged at the specified level
+    /// with error info.
     ///
     /// This is the mechanism that enables automatic tracing when using the `?` operator.
     #[track_caller]
     #[inline(always)]
     fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
         match self {
-            TracingResult::Ok(val) => ControlFlow::Continue(val),
-            TracingResult::Err { err, name } => {
-                // TODO: #1 use std::panic::Location::caller() and construct our own metadata
-                tracing::warn!(error = err.to_string(), "{name}");
-                ControlFlow::Break(TracingResult::Err { err, name })
+            TracingResult::Ok { val, config } => {
+                if let Some(cfg) = config {
+                    match cfg.level {
+                        Level::ERROR => tracing::error!("{}", cfg.message),
+                        Level::WARN => tracing::warn!("{}", cfg.message),
+                        Level::INFO => tracing::info!("{}", cfg.message),
+                        Level::DEBUG => tracing::debug!("{}", cfg.message),
+                        Level::TRACE => tracing::trace!("{}", cfg.message),
+                    }
+                }
+                ControlFlow::Continue(val)
+            }
+            TracingResult::Err { err, config } => {
+                if let Some(cfg) = config {
+                    match cfg.level {
+                        Level::ERROR => tracing::error!(error = err.to_string(), "{}", cfg.message),
+                        Level::WARN => tracing::warn!(error = err.to_string(), "{}", cfg.message),
+                        Level::INFO => tracing::info!(error = err.to_string(), "{}", cfg.message),
+                        Level::DEBUG => tracing::debug!(error = err.to_string(), "{}", cfg.message),
+                        Level::TRACE => tracing::trace!(error = err.to_string(), "{}", cfg.message),
+                    }
+                }
+                ControlFlow::Break(TracingResult::Err { err, config })
             }
         }
     }
 }
 
 impl<T, E: Error> FromResidual for TracingResult<T, E> {
-    fn from_residual(_residual: <Self as Try>::Residual) -> Self {
-        todo!("from residual")
+    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+        match residual {
+            TracingResult::Ok { .. } => unreachable!(),
+            TracingResult::Err { err, config } => Self::Err { err, config },
+        }
     }
 }
 
 impl<T, E: Error> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
         match residual {
+            TracingResult::Ok { .. } => unreachable!(),
             TracingResult::Err { err, .. } => Result::Err(err),
         }
     }
@@ -132,14 +175,15 @@ impl<T, E: Error> Residual<T> for TracingResult<!, E> {
 /// # Example
 ///
 /// ```
+/// use std::io;
 /// use tracing_result::Trace;
 ///
-/// fn might_fail() -> Result<i32, String> {
-///     Err("network error".to_string())
+/// fn might_fail() -> io::Result<i32> {
+///     Err(io::Error::other("network error"))
 /// }
 ///
-/// fn process() -> Result<i32, String> {
-///     let result = might_fail().and_warn("Failed to fetch data");
+/// fn process() -> io::Result<i32> {
+///     let result = might_fail().or_warn("Failed to fetch data");
 ///     // If might_fail() returns Err, "Failed to fetch data" will be logged
 ///     // when result is used with ?
 ///     result?;
@@ -156,10 +200,11 @@ pub trait Trace<T, E: Error> {
     /// # Example
     ///
     /// ```
+    /// use std::io;
     /// use tracing_result::Trace;
     ///
-    /// let result: Result<i32, String> = Err("io error".to_string());
-    /// let tracing_result = result.and_warn("File read failed");
+    /// let result: io::Result<i32> = Err(io::Error::other("io error"));
+    /// let tracing_result = result.or_warn("File read failed");
     ///
     /// // When tracing_result? is used, "File read failed" will be logged
     /// ```
@@ -181,34 +226,106 @@ pub trait Trace<T, E: Error> {
 impl<T, E: Error> Trace<T, E> for Result<T, E> {
     fn or_warn(self, name: &'static str) -> TracingResult<T, E> {
         match self {
-            Ok(val) => TracingResult::Ok(val),
-            Err(err) => TracingResult::Err { err, name },
+            Ok(val) => TracingResult::Ok { val, config: None },
+            Err(err) => TracingResult::Err {
+                err,
+                config: Some(TracingConfig {
+                    level: Level::WARN,
+                    message: name,
+                }),
+            },
         }
     }
 
     fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok {
+                val,
+                config: Some(TracingConfig {
+                    level: Level::WARN,
+                    message: name,
+                }),
+            },
+            Err(err) => TracingResult::Err { err, config: None },
+        }
     }
 
     fn or_error(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok { val, config: None },
+            Err(err) => TracingResult::Err {
+                err,
+                config: Some(TracingConfig {
+                    level: Level::ERROR,
+                    message: name,
+                }),
+            },
+        }
     }
+
     fn and_error(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok {
+                val,
+                config: Some(TracingConfig {
+                    level: Level::ERROR,
+                    message: name,
+                }),
+            },
+            Err(err) => TracingResult::Err { err, config: None },
+        }
     }
 
     fn or_debug(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok { val, config: None },
+            Err(err) => TracingResult::Err {
+                err,
+                config: Some(TracingConfig {
+                    level: Level::DEBUG,
+                    message: name,
+                }),
+            },
+        }
     }
+
     fn and_debug(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok {
+                val,
+                config: Some(TracingConfig {
+                    level: Level::DEBUG,
+                    message: name,
+                }),
+            },
+            Err(err) => TracingResult::Err { err, config: None },
+        }
     }
 
     fn or_trace(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok { val, config: None },
+            Err(err) => TracingResult::Err {
+                err,
+                config: Some(TracingConfig {
+                    level: Level::TRACE,
+                    message: name,
+                }),
+            },
+        }
     }
+
     fn and_trace(self, name: &'static str) -> TracingResult<T, E> {
-        todo!("")
+        match self {
+            Ok(val) => TracingResult::Ok {
+                val,
+                config: Some(TracingConfig {
+                    level: Level::TRACE,
+                    message: name,
+                }),
+            },
+            Err(err) => TracingResult::Err { err, config: None },
+        }
     }
 }
 
