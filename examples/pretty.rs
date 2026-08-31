@@ -1,11 +1,13 @@
+use std::io;
+
 use tracing_result::*;
 use tracing_subscriber::{filter::LevelFilter, fmt::layer, prelude::*, registry};
 
-fn main() -> Result<(), String> {
+fn main() -> io::Result<()> {
     let stdout = layer().pretty().with_filter(LevelFilter::TRACE);
     registry().with(stdout).init();
 
-    Err("Oopsie".to_string()).and_warn("boom!")?;
+    Err(io::Error::other("Oopsie")).and_warn("boom!")?;
 
     Ok(())
 }

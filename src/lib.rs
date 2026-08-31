@@ -37,7 +37,10 @@
 //! - Automatic tracing on error propagation via `?`
 //! - Compatible with Rust's unstable `Try` trait v2 (when enabled)
 
-use std::ops::{ControlFlow, FromResidual, Residual, Try};
+use std::{
+    error::Error,
+    ops::{ControlFlow, FromResidual, Residual, Try},
+};
 
 /// A result type that emits tracing warnings when errors occur.
 ///
@@ -62,17 +65,17 @@ use std::ops::{ControlFlow, FromResidual, Residual, Try};
 ///     Ok(a / b)
 /// }
 /// ```
-pub enum TracingResult<T, E> {
+pub enum TracingResult<T, E: Error> {
     /// Success case containing the result value.
     Ok(T),
     /// Error case containing both the error and a message to be logged.
     ///
     /// The `msg` field is logged via [`tracing::warn`] when the error
     /// is propagated using the `?` operator.
-    Err { err: E, msg: String },
+    Err { err: E, name: &'static str },
 }
 
-impl<T, E> Try for TracingResult<T, E> {
+impl<T, E: Error> Try for TracingResult<T, E> {
     type Output = T;
 
     type Residual = TracingResult<!, E>;
@@ -93,22 +96,22 @@ impl<T, E> Try for TracingResult<T, E> {
     fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
         match self {
             TracingResult::Ok(val) => ControlFlow::Continue(val),
-            TracingResult::Err { err, msg } => {
+            TracingResult::Err { err, name } => {
                 // TODO: #1 use std::panic::Location::caller() and construct our own metadata
-                tracing::warn!("{msg}");
-                ControlFlow::Break(TracingResult::Err { err, msg })
+                tracing::warn!(error = err.to_string(), "{name}");
+                ControlFlow::Break(TracingResult::Err { err, name })
             }
         }
     }
 }
 
-impl<T, E> FromResidual for TracingResult<T, E> {
+impl<T, E: Error> FromResidual for TracingResult<T, E> {
     fn from_residual(_residual: <Self as Try>::Residual) -> Self {
         todo!("from residual")
     }
 }
 
-impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
+impl<T, E: Error> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
         match residual {
             TracingResult::Err { err, .. } => Result::Err(err),
@@ -116,7 +119,7 @@ impl<T, E> FromResidual<TracingResult<!, E>> for Result<T, E> {
     }
 }
 
-impl<T, E> Residual<T> for TracingResult<!, E> {
+impl<T, E: Error> Residual<T> for TracingResult<!, E> {
     type TryType = TracingResult<T, E>;
 }
 
@@ -143,7 +146,7 @@ impl<T, E> Residual<T> for TracingResult<!, E> {
 ///     Ok(42)
 /// }
 /// ```
-pub trait Trace<T, E> {
+pub trait Trace<T, E: Error> {
     /// Attaches a warning message to this result.
     ///
     /// Converts the [`Result`] into a [`TracingResult`] that will log the
@@ -160,23 +163,22 @@ pub trait Trace<T, E> {
     ///
     /// // When tracing_result? is used, "File read failed" will be logged
     /// ```
-    fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E>;
+    fn and_warn(self, name: &'static str) -> TracingResult<T, E>;
 }
 
-impl<T, E> Trace<T, E> for Result<T, E> {
-    fn and_warn<S: ToString>(self, msg: S) -> TracingResult<T, E> {
+impl<T, E: Error> Trace<T, E> for Result<T, E> {
+    fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
         match self {
             Ok(val) => TracingResult::Ok(val),
-            Err(err) => TracingResult::Err {
-                err,
-                msg: msg.to_string(),
-            },
+            Err(err) => TracingResult::Err { err, name },
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::io;
+
     use tracing_test::traced_test;
 
     use super::*;
@@ -185,7 +187,7 @@ mod tests {
     #[traced_test]
     #[test]
     fn and_warn_ok() {
-        fn no_error() -> Result<(), ()> {
+        fn no_error() -> io::Result<()> {
             Ok(()).and_warn("stuff")?;
             Ok(())
         }
@@ -198,13 +200,13 @@ mod tests {
     #[traced_test]
     #[test]
     fn and_warn_err() {
-        fn err() -> Result<(), ()> {
-            Err(()).and_warn("stuff")?;
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).and_warn("stuff")?;
             Ok(())
         }
 
         assert!(err().is_err());
-        assert!(!logs_contain("msg"));
+        assert!(!logs_contain("name"));
         assert!(logs_contain("stuff"));
     }
 }
