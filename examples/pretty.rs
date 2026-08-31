@@ -17,6 +17,7 @@ fn main() -> io::Result<()> {
 
     Ok(42).and_trace("This will log a TRACE on success")?;
 
+    // Only the first uncommented one of these triggers
     Err(io::Error::other("Oopsie")).or_warn("This will log a WARN on error")?;
 
     Err(io::Error::other("Critical")).or_error("This will log an ERROR on error")?;
