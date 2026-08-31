@@ -41656,275 +41656,27 @@
     "docs": "Returns true if the new event should be a root."
   },
   {
-    "name": "0",
+    "name": "level",
     "type": "struct_field",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
     "id": "0",
-    "docs": null
+    "docs": "The tracing level to use when logging."
   },
   {
-    "name": "TryType",
-    "type": "assoc_type",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "69",
-    "docs": null
-  },
-  {
-    "name": "TracingResult",
-    "type": "enum",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "6",
-    "docs": "A result type that emits tracing warnings when errors occur.\n\n[`TracingResult`] acts like the standard [`Result`] type, adding the ability to\nassociate a custom warning message with errors. When an error is propagated\nusing the `?` operator, the message is automatically logged via [`tracing::warn`].\n\nIt is usually constructed via [Result::and_warn][Trace::and_warn] and rarely returned\ndirectly - `?` will work in a block which returns [`Result`]\n\n# Example\n\n```\nuse tracing_result::{Trace, TracingResult};\n\nfn divide(a: i32, b: i32) -> Result<i32, String> {\n    if b == 0 {\n        let oops: TracingResult<_, _> = Err(\"division by zero\".to_string())\n            .and_warn(\"Cannot divide by zero\");\n        oops?;\n    }\n    Ok(a / b)\n}\n```"
-  },
-  {
-    "name": "or_debug",
+    "name": "type_id",
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "75",
+    "id": "44",
     "docs": null
   },
   {
-    "name": "Error",
-    "type": "assoc_type",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "37",
-    "docs": null
-  },
-  {
-    "name": "and_warn",
+    "name": "clone_to_uninit",
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "81",
-    "docs": null
-  },
-  {
-    "name": "try_from",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "43",
-    "docs": null
-  },
-  {
-    "name": "and_trace",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "87",
-    "docs": null
-  },
-  {
-    "name": "borrow",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "24",
-    "docs": null
-  },
-  {
-    "name": "Err",
-    "type": "variant",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "5",
-    "docs": "Error case containing both the error and a message to be logged.\n\nThe `msg` field is logged via [`tracing::warn`] when the error\nis propagated using the `?` operator."
-  },
-  {
-    "name": "and_error",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "74",
-    "docs": null
-  },
-  {
-    "name": "from_output",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "55",
-    "docs": null
-  },
-  {
-    "name": "or_warn",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "80",
-    "docs": null
-  },
-  {
-    "name": "branch",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "61",
-    "docs": "Executes the `Try` branch operation, **logging error messages on `?``**`.\n\nWhen the result is [`Err`], the associated message is logged via [`tracing::warn`]\nand a [`ControlFlow::Break`] is returned with the error. For [`Ok`] values,\n[`ControlFlow::Continue`] is returned with the unwrapped value.\n\nThis is the mechanism that enables automatic tracing when using the `?` operator."
-  },
-  {
-    "name": "Error",
-    "type": "assoc_type",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "42",
-    "docs": null
-  },
-  {
-    "name": "or_trace",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "86",
-    "docs": null
-  },
-  {
-    "name": "from_residual",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "67",
-    "docs": null
-  },
-  {
-    "name": "or_error",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "73",
-    "docs": null
-  },
-  {
-    "name": "Residual",
-    "type": "assoc_type",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "54",
-    "docs": null
-  },
-  {
-    "name": "from",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "35",
-    "docs": "Returns the argument unchanged."
-  },
-  {
-    "name": "Trace",
-    "type": "trait",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "79",
-    "docs": "A trait for converting results into tracing results with warning messages.\n\nThis trait extends [`Result<T, E>`] with the [`and_warn`][Trace::and_warn] method,\nwhich attaches a custom warning message to errors. When the resulting [`TracingResult`] is\nused with the `?` operator, the message will be automatically logged.\n\n# Example\n\n```\nuse tracing_result::Trace;\n\nfn might_fail() -> Result<i32, String> {\n    Err(\"network error\".to_string())\n}\n\nfn process() -> Result<i32, String> {\n    let result = might_fail().and_warn(\"Failed to fetch data\");\n    // If might_fail() returns Err, \"Failed to fetch data\" will be logged\n    // when result is used with ?\n    result?;\n    Ok(42)\n}\n```"
-  },
-  {
-    "name": "and_debug",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "85",
-    "docs": null
-  },
-  {
-    "name": "name",
-    "type": "struct_field",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "3",
-    "docs": null
-  },
-  {
-    "name": "borrow_mut",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "28",
-    "docs": null
-  },
-  {
-    "name": "or_warn",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "72",
-    "docs": "Attaches a warning message to this result.\n\nConverts the [`Result`] into a [`TracingResult`] that will log the\nprovided message via [`tracing::warn`] if an error occurs and is\npropagated with the `?` operator.\n\n# Example\n\n```\nuse tracing_result::Trace;\n\nlet result: Result<i32, String> = Err(\"io error\".to_string());\nlet tracing_result = result.and_warn(\"File read failed\");\n\n// When tracing_result? is used, \"File read failed\" will be logged\n```"
-  },
-  {
-    "name": "Output",
-    "type": "assoc_type",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "53",
-    "docs": null
-  },
-  {
-    "name": "and_trace",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "78",
-    "docs": null
-  },
-  {
-    "name": "or_debug",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "84",
-    "docs": null
-  },
-  {
-    "name": "err",
-    "type": "struct_field",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "2",
-    "docs": null
-  },
-  {
-    "name": "and_warn",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "8",
-    "docs": "emits a WARN when OK unpacked via `?`"
-  },
-  {
-    "name": "or_trace",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "77",
-    "docs": null
-  },
-  {
-    "name": "try_into",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "39",
-    "docs": null
-  },
-  {
-    "name": "and_error",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "83",
-    "docs": null
-  },
-  {
-    "name": "from_residual",
-    "type": "function",
-    "crate": "tracing_result",
-    "file": "./docs/doc/tracing_result.json",
-    "id": "64",
+    "id": "25",
     "docs": null
   },
   {
@@ -41932,39 +41684,167 @@
     "type": "variant",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "1",
-    "docs": "Success case containing the result value."
+    "id": "69",
+    "docs": "Success case containing the result value and optional tracing configuration."
   },
   {
-    "name": "type_id",
+    "name": "clone_into",
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "45",
+    "id": "50",
     "docs": null
   },
   {
-    "name": "tracing_result",
-    "type": "module",
+    "name": "Residual",
+    "type": "assoc_type",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "89",
-    "docs": "A library for ergonomic error handling with tracing support.\n\nThis crate provides [`TracingResult`], a wrapper around [`Result`] that automatically\nemits tracing messages when errors occur. It integrates seamlessly with Rust's\n[`Try`] trait and the `?` operator.\n\n# Overview\n\nThe [`Trace`] trait extends [`Result`] with the [`and_warn`][Trace::and_warn] method,\nwhich converts a [`Result`] into a [`TracingResult`] with a custom warning message.\nWhen used with the `?` operator, errors will automatically log the message via [`tracing::warn`].\n\n# Example\n\n```\nuse tracing_result::{Trace, TracingResult};\n\nfn might_fail() -> Result<u32, String> {\n    Err(\"something went wrong\".to_string())\n}\n\nfn compute() -> Result<u32, String> {\n    might_fail().and_warn(\"Failed to compute value\")?;\n    Ok(42)\n}\n\n// When compute() is called and might_fail() returns Err,\n// \"Failed to compute value\" will be logged as a warning.\n```\n\n# Features\n\n- Automatic tracing on error propagation via `?`\n- Compatible with Rust's unstable `Try` trait v2 (when enabled)"
+    "id": "94",
+    "docs": null
+  },
+  {
+    "name": "or_debug",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "113",
+    "docs": null
+  },
+  {
+    "name": "and_warn",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "75",
+    "docs": "emits a WARN when OK unpacked via `?`"
+  },
+  {
+    "name": "and_warn",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "119",
+    "docs": null
+  },
+  {
+    "name": "try_into",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "37",
+    "docs": null
+  },
+  {
+    "name": "borrow",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "18",
+    "docs": null
+  },
+  {
+    "name": "clone",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "62",
+    "docs": null
+  },
+  {
+    "name": "and_trace",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "125",
+    "docs": null
+  },
+  {
+    "name": "and_error",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "112",
+    "docs": null
+  },
+  {
+    "name": "to_owned",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "49",
+    "docs": null
+  },
+  {
+    "name": "Output",
+    "type": "assoc_type",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "93",
+    "docs": null
   },
   {
     "name": "into",
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "32",
+    "id": "30",
     "docs": "Calls `U::from(self)`.\n\nThat is, this conversion is whatever the implementation of\n<code>[From]&lt;T&gt; for U</code> chooses to do."
   },
   {
-    "name": "and_debug",
+    "name": "or_warn",
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "76",
+    "id": "118",
+    "docs": null
+  },
+  {
+    "name": "branch",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "99",
+    "docs": "Executes the `Try` branch operation, logging messages based on config.\n\nWhen the result is [`Ok`] with a config, the message is logged at the specified level.\nWhen the result is [`Err`] with a config, the message is logged at the specified level\nwith error info.\n\nThis is the mechanism that enables automatic tracing when using the `?` operator."
+  },
+  {
+    "name": "or_trace",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "124",
+    "docs": null
+  },
+  {
+    "name": "from_residual",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "105",
+    "docs": null
+  },
+  {
+    "name": "try_from",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "42",
+    "docs": null
+  },
+  {
+    "name": "config",
+    "type": "struct_field",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "67",
+    "docs": null
+  },
+  {
+    "name": "Owned",
+    "type": "assoc_type",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "48",
     "docs": null
   },
   {
@@ -41972,7 +41852,207 @@
     "type": "function",
     "crate": "tracing_result",
     "file": "./docs/doc/tracing_result.json",
-    "id": "82",
+    "id": "111",
+    "docs": null
+  },
+  {
+    "name": "TracingResult",
+    "type": "enum",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "73",
+    "docs": "A result type that emits tracing warnings when errors occur.\n\n[`TracingResult`] acts like the standard [`Result`] type, adding the ability to\nassociate a custom warning message with errors. When an error is propagated\nusing the `?` operator, the message is automatically logged via [`tracing::warn`].\n\nIt is usually constructed via [Result::and_warn][Trace::and_warn] and rarely returned\ndirectly - `?` will work in a block which returns [`Result`]\n\n# Example\n\n```\nuse std::io;\nuse tracing_result::{Trace, TracingResult};\n\nfn divide(a: i32, b: i32) -> io::Result<i32> {\n    if b == 0 {\n        let oops: TracingResult<_, _> = Err(io::Error::other(\"division by zero\"))\n            .or_warn(\"Cannot divide by zero\");\n        oops?;\n    }\n    Ok(a / b)\n}\n```"
+  },
+  {
+    "name": "Trace",
+    "type": "trait",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "117",
+    "docs": "A trait for converting results into tracing results with warning messages.\n\nThis trait extends [`Result<T, E>`] with the [`and_warn`][Trace::and_warn] method,\nwhich attaches a custom warning message to errors. When the resulting [`TracingResult`] is\nused with the `?` operator, the message will be automatically logged.\n\n# Example\n\n```\nuse std::io;\nuse tracing_result::Trace;\n\nfn might_fail() -> io::Result<i32> {\n    Err(io::Error::other(\"network error\"))\n}\n\nfn process() -> io::Result<i32> {\n    let result = might_fail().or_warn(\"Failed to fetch data\");\n    // If might_fail() returns Err, \"Failed to fetch data\" will be logged\n    // when result is used with ?\n    result?;\n    Ok(42)\n}\n```"
+  },
+  {
+    "name": "Error",
+    "type": "assoc_type",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "35",
+    "docs": null
+  },
+  {
+    "name": "and_debug",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "123",
+    "docs": null
+  },
+  {
+    "name": "Error",
+    "type": "assoc_type",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "41",
+    "docs": null
+  },
+  {
+    "name": "borrow_mut",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "22",
+    "docs": null
+  },
+  {
+    "name": "val",
+    "type": "struct_field",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "66",
+    "docs": null
+  },
+  {
+    "name": "TracingConfig",
+    "type": "struct",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "3",
+    "docs": "Configuration for tracing log level and message."
+  },
+  {
+    "name": "or_warn",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "110",
+    "docs": "Attaches a warning message to this result.\n\nConverts the [`Result`] into a [`TracingResult`] that will log the\nprovided message via [`tracing::warn`] if an error occurs and is\npropagated with the `?` operator.\n\n# Example\n\n```\nuse std::io;\nuse tracing_result::Trace;\n\nlet result: io::Result<i32> = Err(io::Error::other(\"io error\"));\nlet tracing_result = result.or_warn(\"File read failed\");\n\n// When tracing_result? is used, \"File read failed\" will be logged\n```"
+  },
+  {
+    "name": "Err",
+    "type": "variant",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "72",
+    "docs": "Error case containing both the error and optional tracing configuration.\n\nIf `config` is present, the message is logged at the specified level\nwhen the error is propagated using the `?` operator."
+  },
+  {
+    "name": "and_trace",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "116",
+    "docs": null
+  },
+  {
+    "name": "or_debug",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "122",
+    "docs": null
+  },
+  {
+    "name": "message",
+    "type": "struct_field",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "2",
+    "docs": "The message to log."
+  },
+  {
+    "name": "config",
+    "type": "struct_field",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "71",
+    "docs": null
+  },
+  {
+    "name": "or_trace",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "115",
+    "docs": null
+  },
+  {
+    "name": "from",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "33",
+    "docs": "Returns the argument unchanged."
+  },
+  {
+    "name": "and_error",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "121",
+    "docs": null
+  },
+  {
+    "name": "from_residual",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "102",
+    "docs": null
+  },
+  {
+    "name": "tracing_result",
+    "type": "module",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "127",
+    "docs": "A library for ergonomic error handling with tracing support.\n\nThis crate provides [`TracingResult`], a wrapper around [`Result`] that automatically\nemits tracing messages when errors occur. It integrates seamlessly with Rust's\n[`Try`] trait and the `?` operator.\n\n# Overview\n\nThe [`Trace`] trait extends [`Result`] with the [`and_warn`][Trace::and_warn] method,\nwhich converts a [`Result`] into a [`TracingResult`] with a custom warning message.\nWhen used with the `?` operator, errors will automatically log the message via [`tracing::warn`].\n\n# Example\n\n```\nuse std::io;\nuse tracing_result::{Trace, TracingResult};\n\nfn might_fail() -> io::Result<u32> {\n    Err(io::Error::other(\"something went wrong\"))\n}\n\nfn compute() -> io::Result<u32> {\n    might_fail().or_warn(\"Failed to compute value\")?;\n    Ok(42)\n}\n\n// When compute() is called and might_fail() returns Err,\n// \"Failed to compute value\" will be logged as a warning.\n```\n\n# Features\n\n- Automatic tracing on error propagation via `?`\n- Compatible with Rust's unstable `Try` trait v2 (when enabled)"
+  },
+  {
+    "name": "err",
+    "type": "struct_field",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "70",
+    "docs": null
+  },
+  {
+    "name": "and_debug",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "114",
+    "docs": null
+  },
+  {
+    "name": "from_output",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "95",
+    "docs": null
+  },
+  {
+    "name": "or_error",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "120",
+    "docs": null
+  },
+  {
+    "name": "fmt",
+    "type": "function",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "57",
+    "docs": null
+  },
+  {
+    "name": "TryType",
+    "type": "assoc_type",
+    "crate": "tracing_result",
+    "file": "./docs/doc/tracing_result.json",
+    "id": "107",
     "docs": null
   },
   {

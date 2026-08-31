@@ -1609,6 +1609,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "set": [
@@ -4113,6 +4117,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "OnceNonZeroUsize": [
@@ -6321,6 +6329,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "clone_into": [
@@ -6347,6 +6359,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "to_owned": [
@@ -6373,6 +6389,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "with_value": [
@@ -6443,6 +6463,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "OnceBox": [
@@ -9875,10 +9899,6 @@
     {
       "crate": "syn",
       "file": "./docs/doc/syn.json"
-    },
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "line": [
@@ -16607,10 +16627,6 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
-    },
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "HalfOpen": [
@@ -23347,18 +23363,16 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "record_u64": [
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
-    }
-  ],
-  "TracingResult": [
-    {
-      "crate": "tracing_result",
-      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "or_debug": [
@@ -23421,6 +23435,22 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
+  "config": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "TracingResult": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
   "Trace": [
     {
       "crate": "tracing_result",
@@ -23437,13 +23467,31 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "err": [
+  "val": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "TracingConfig": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "message": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
     }
   ],
   "tracing_result": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "err": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
