@@ -16,6 +16,7 @@ try_v2 = "0.10.1"
 tracing = "0.1"
 
 [dev-dependencies]
+tracing-subscriber = { version = "0.3", features = ["fmt"] }
 tracing-test = "0.2.6"
 
 [build-dependencies]

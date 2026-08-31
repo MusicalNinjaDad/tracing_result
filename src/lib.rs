@@ -88,6 +88,8 @@ impl<T, E> Try for TracingResult<T, E> {
     /// [`ControlFlow::Continue`] is returned with the unwrapped value.
     ///
     /// This is the mechanism that enables automatic tracing when using the `?` operator.
+    #[track_caller]
+    #[inline(always)]
     fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
         match self {
             TracingResult::Ok(val) => ControlFlow::Continue(val),
