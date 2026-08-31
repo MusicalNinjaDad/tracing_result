@@ -94,6 +94,7 @@ impl<T, E> Try for TracingResult<T, E> {
         match self {
             TracingResult::Ok(val) => ControlFlow::Continue(val),
             TracingResult::Err { err, msg } => {
+                // TODO: #1 use std::panic::Location::caller() and construct our own metadata
                 tracing::warn!("{msg}");
                 ControlFlow::Break(TracingResult::Err { err, msg })
             }
