@@ -337,10 +337,10 @@ mod tests {
 
     use super::*;
 
-    /// Tests that `and_warn` on an Ok result does not log a warning.
+    /// Tests that `or_warn` on an Ok result does not log.
     #[traced_test]
     #[test]
-    fn and_warn_ok() {
+    fn or_warn_ok() {
         fn no_error() -> io::Result<()> {
             Ok(()).or_warn("stuff")?;
             Ok(())
@@ -350,10 +350,10 @@ mod tests {
         assert!(!logs_contain("stuff"));
     }
 
-    /// Tests that `and_warn` on an Err result logs the warning message.
+    /// Tests that `or_warn` on an Err result logs the warning message.
     #[traced_test]
     #[test]
-    fn and_warn_err() {
+    fn or_warn_err() {
         fn err() -> io::Result<()> {
             Err(io::Error::other("oops")).or_warn("stuff")?;
             Ok(())
@@ -362,5 +362,187 @@ mod tests {
         assert!(err().is_err());
         assert!(!logs_contain("name"));
         assert!(logs_contain("stuff"));
+    }
+
+    /// Tests that `and_warn` on an Ok result logs the warning message.
+    #[traced_test]
+    #[test]
+    fn and_warn_ok() {
+        fn ok() -> io::Result<()> {
+            Ok(()).and_warn("ok warn")?;
+            Ok(())
+        }
+
+        assert!(ok().is_ok());
+        assert!(logs_contain("ok warn"));
+    }
+
+    /// Tests that `and_warn` on an Err result does not log.
+    #[traced_test]
+    #[test]
+    fn and_warn_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).and_warn("should not log")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_error` on an Ok result does not log.
+    #[traced_test]
+    #[test]
+    fn or_error_ok() {
+        fn no_error() -> io::Result<()> {
+            Ok(()).or_error("should not log")?;
+            Ok(())
+        }
+
+        assert!(no_error().is_ok());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_error` on an Err result logs at ERROR level.
+    #[traced_test]
+    #[test]
+    fn or_error_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).or_error("error message")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(logs_contain("error message"));
+    }
+
+    /// Tests that `and_error` on an Ok result logs at ERROR level.
+    #[traced_test]
+    #[test]
+    fn and_error_ok() {
+        fn ok() -> io::Result<()> {
+            Ok(()).and_error("error on ok")?;
+            Ok(())
+        }
+
+        assert!(ok().is_ok());
+        assert!(logs_contain("error on ok"));
+    }
+
+    /// Tests that `and_error` on an Err result does not log.
+    #[traced_test]
+    #[test]
+    fn and_error_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).and_error("should not log")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_debug` on an Ok result does not log.
+    #[traced_test]
+    #[test]
+    fn or_debug_ok() {
+        fn no_error() -> io::Result<()> {
+            Ok(()).or_debug("should not log")?;
+            Ok(())
+        }
+
+        assert!(no_error().is_ok());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_debug` on an Err result logs at DEBUG level.
+    #[traced_test]
+    #[test]
+    fn or_debug_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).or_debug("debug message")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(logs_contain("debug message"));
+    }
+
+    /// Tests that `and_debug` on an Ok result logs at DEBUG level.
+    #[traced_test]
+    #[test]
+    fn and_debug_ok() {
+        fn ok() -> io::Result<()> {
+            Ok(()).and_debug("debug on ok")?;
+            Ok(())
+        }
+
+        assert!(ok().is_ok());
+        assert!(logs_contain("debug on ok"));
+    }
+
+    /// Tests that `and_debug` on an Err result does not log.
+    #[traced_test]
+    #[test]
+    fn and_debug_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).and_debug("should not log")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_trace` on an Ok result does not log.
+    #[traced_test]
+    #[test]
+    fn or_trace_ok() {
+        fn no_error() -> io::Result<()> {
+            Ok(()).or_trace("should not log")?;
+            Ok(())
+        }
+
+        assert!(no_error().is_ok());
+        assert!(!logs_contain("should not log"));
+    }
+
+    /// Tests that `or_trace` on an Err result logs at TRACE level.
+    #[traced_test]
+    #[test]
+    fn or_trace_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).or_trace("trace message")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(logs_contain("trace message"));
+    }
+
+    /// Tests that `and_trace` on an Ok result logs at TRACE level.
+    #[traced_test]
+    #[test]
+    fn and_trace_ok() {
+        fn ok() -> io::Result<()> {
+            Ok(()).and_trace("trace on ok")?;
+            Ok(())
+        }
+
+        assert!(ok().is_ok());
+        assert!(logs_contain("trace on ok"));
+    }
+
+    /// Tests that `and_trace` on an Err result does not log.
+    #[traced_test]
+    #[test]
+    fn and_trace_err() {
+        fn err() -> io::Result<()> {
+            Err(io::Error::other("oops")).and_trace("should not log")?;
+            Ok(())
+        }
+
+        assert!(err().is_err());
+        assert!(!logs_contain("should not log"));
     }
 }
