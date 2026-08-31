@@ -162,6 +162,7 @@ impl<T, E: Error> Try for TracingResult<T, E> {
     }
 }
 
+/// TODO: #3 double emission
 impl<T, E: Error> FromResidual for TracingResult<T, E> {
     fn from_residual(residual: <Self as Try>::Residual) -> Self {
         match residual {
