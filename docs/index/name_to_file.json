@@ -10145,6 +10145,14 @@
     {
       "crate": "proc_macro2_diagnostic",
       "file": "./docs/doc/proc_macro2_diagnostic.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "ToDiagnostic": [
@@ -16599,6 +16607,10 @@
     {
       "crate": "tracing_core",
       "file": "./docs/doc/tracing_core.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
     }
   ],
   "HalfOpen": [
@@ -23343,13 +23355,17 @@
       "file": "./docs/doc/tracing_core.json"
     }
   ],
-  "msg": [
+  "TracingResult": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "TracingResult": [
+  "or_debug": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
@@ -23365,13 +23381,63 @@
       "file": "./docs/doc/tracing_result.json"
     }
   ],
-  "err": [
+  "and_trace": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "and_error": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "or_warn": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "or_trace": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
     }
   ],
   "Trace": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "and_debug": [
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    },
+    {
+      "crate": "tracing_result",
+      "file": "./docs/doc/tracing_result.json"
+    }
+  ],
+  "err": [
     {
       "crate": "tracing_result",
       "file": "./docs/doc/tracing_result.json"
