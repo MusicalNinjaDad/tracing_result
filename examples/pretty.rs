@@ -11,7 +11,7 @@ fn main() -> io::Result<()> {
     let answer = 42;
 
     warn_span!("pretty example", answer);
-    Err(io::Error::other("Oopsie")).and_warn("boom!")?;
+    Err(io::Error::other("Oopsie")).or_warn("boom!")?;
 
     Ok(())
 }

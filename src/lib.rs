@@ -163,15 +163,52 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "File read failed" will be logged
     /// ```
+    fn or_warn(self, name: &'static str) -> TracingResult<T, E>;
+
+    /// emits a WARN when OK unpacked via `?`
     fn and_warn(self, name: &'static str) -> TracingResult<T, E>;
+
+    fn or_error(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_error(self, name: &'static str) -> TracingResult<T, E>;
+
+    fn or_debug(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_debug(self, name: &'static str) -> TracingResult<T, E>;
+
+    fn or_trace(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_trace(self, name: &'static str) -> TracingResult<T, E>;
 }
 
 impl<T, E: Error> Trace<T, E> for Result<T, E> {
-    fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
+    fn or_warn(self, name: &'static str) -> TracingResult<T, E> {
         match self {
             Ok(val) => TracingResult::Ok(val),
             Err(err) => TracingResult::Err { err, name },
         }
+    }
+
+    fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+
+    fn or_error(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+    fn and_error(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+
+    fn or_debug(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+    fn and_debug(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+
+    fn or_trace(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
+    }
+    fn and_trace(self, name: &'static str) -> TracingResult<T, E> {
+        todo!("")
     }
 }
 
@@ -188,7 +225,7 @@ mod tests {
     #[test]
     fn and_warn_ok() {
         fn no_error() -> io::Result<()> {
-            Ok(()).and_warn("stuff")?;
+            Ok(()).or_warn("stuff")?;
             Ok(())
         }
 
@@ -201,7 +238,7 @@ mod tests {
     #[test]
     fn and_warn_err() {
         fn err() -> io::Result<()> {
-            Err(io::Error::other("oops")).and_warn("stuff")?;
+            Err(io::Error::other("oops")).or_warn("stuff")?;
             Ok(())
         }
 
