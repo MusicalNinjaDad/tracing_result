@@ -1,5 +1,5 @@
 [package]
-name = "tracing_result"
+name = "tracing-result"
 description = "An ergonomic wrapper making it easy to emit tracing messages on errors."
 categories = ["Rust patterns"]
 keywords = ["tracing"]
