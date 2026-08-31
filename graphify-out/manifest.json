@@ -1,0 +1,27 @@
+{
+  "Cargo.toml": {
+    "mtime": 1788154520.5065634,
+    "ast_hash": "ba3e96d1a3962c5fb694f266e0c01de6",
+    "semantic_hash": "ba3e96d1a3962c5fb694f266e0c01de6"
+  },
+  "src/lib.rs": {
+    "mtime": 1788185382.931758,
+    "ast_hash": "2201cf243b378601358894cafac566a4",
+    "semantic_hash": "2201cf243b378601358894cafac566a4"
+  },
+  "examples/pretty.rs": {
+    "mtime": 1788182357.488137,
+    "ast_hash": "1f32a4da569f75b9caedc8b44983c1ab",
+    "semantic_hash": "1f32a4da569f75b9caedc8b44983c1ab"
+  },
+  "AGENTS.md": {
+    "mtime": 1788108617.7702,
+    "ast_hash": "39b7caffbe1422b1cc90b895d6288345",
+    "semantic_hash": "39b7caffbe1422b1cc90b895d6288345"
+  },
+  "README.md": {
+    "mtime": 1788109033.7237875,
+    "ast_hash": "5912319c2c836b7207f8f6b7e6d8e41a",
+    "semantic_hash": "5912319c2c836b7207f8f6b7e6d8e41a"
+  }
+}

@@ -1,5 +1,5 @@
 [package]
-name = "tracing_result"
+name = "tracing-result"
 description = "An ergonomic wrapper making it easy to emit tracing messages on errors."
 categories = ["Rust patterns"]
 keywords = ["tracing"]
@@ -16,6 +16,8 @@ try_v2 = "0.10.1"
 tracing = "0.1"
 
 [dev-dependencies]
+tracing-subscriber = { version = "0.3", features = ["fmt"] }
+tracing-test = "0.2.6"
 
 [build-dependencies]
 build_safely = "0.5.4"

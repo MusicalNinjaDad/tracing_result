@@ -7,5 +7,9 @@ fn main() -> Result<()> {
     // `unstable.allow-features` in `.cargo/config.toml`.
     let allowed_features = cargo_allowed_features()?;
 
+    ac.emit_unstable_feature(never_type, &allowed_features);
+    ac.emit_unstable_feature(try_trait_v2, &allowed_features);
+    ac.emit_unstable_feature(try_trait_v2_residual, &allowed_features);
+
     Ok(())
 }
