@@ -7,7 +7,7 @@ authors = ["Mike Foster <https://github.com/MusicalNinjaDad>"]
 repository = "https://github.com/MusicalNinjaDad/tracing_result"
 license = "MIT"
 edition = "2024"
-version = "0.0.1"
+version = "0.0.0"
 
 [dependencies]
 tracing = "0.1.44"
