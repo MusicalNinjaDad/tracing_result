@@ -12,7 +12,7 @@ permissions:
 jobs:
   merge:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'MusicalNinjaDad/redbook'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'MusicalNinjaDad/tracing_result'
     steps:
       - name: Ensure this is a valid dependabot PR
         id: metadata
