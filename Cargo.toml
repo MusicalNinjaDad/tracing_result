@@ -1,7 +1,7 @@
 [package]
 name = "tracing-result"
 description = "An ergonomic wrapper making it easy to emit tracing messages on errors."
-categories = ["Rust patterns"]
+categories = ["rust-patterns"]
 keywords = ["tracing"]
 authors = ["Mike Foster <https://github.com/MusicalNinjaDad>"]
 repository = "https://github.com/MusicalNinjaDad/tracing_result"
