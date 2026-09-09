@@ -27,7 +27,7 @@ jobs:
       name: get version
       run: |
         v="$(jaq -cr .workspace.package.version Cargo.toml)"
-        echo "try_v2 version: $v"
+        echo "version: $v"
         
         echo "version=$v" >> $GITHUB_OUTPUT
         echo "# version $v" >> $GITHUB_STEP_SUMMARY
