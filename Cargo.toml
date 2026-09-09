@@ -9,7 +9,7 @@ repository = "https://github.com/MusicalNinjaDad/tracing_result"
 readme = "README.md"
 license = "MIT"
 edition = "2024"
-version = "0.1.0"
+version = "0.0.1"
 
 [dependencies]
 try_v2 = "0.10.1"
