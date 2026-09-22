@@ -112,7 +112,12 @@ pub enum TracingResult<T, E> {
     },
 }
 
-/// Calling any of the transform functions *will emit* the enclosed logs
+/// Calling any of the extract functions *will emit* the enclosed tracing entries related
+/// to the relevant variant.
+/// 
+/// E.g.
+/// - `.unwrap()` will emit any entries stored on the `Ok` variant but *not* any entries stored
+///   on the `Err` variant.
 impl<T, E: Error> Extract<T> for TracingResult<T, E> {}
 
 impl<T, E: Error> TracingResult<T, E> {
