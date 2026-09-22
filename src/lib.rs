@@ -52,6 +52,7 @@ use std::{
     ops::{ControlFlow, FromResidual, Residual, Try},
 };
 use tracing::Level;
+use try_v2::Extract;
 
 /// Configuration for tracing log level and message.
 ///
@@ -110,6 +111,9 @@ pub enum TracingResult<T, E: Error> {
         config: Option<TracingConfig>,
     },
 }
+
+/// Calling any of the transform functions *will emit* the enclosed logs
+impl<T,E: Error> Extract<T> for TracingResult<T, E> {}
 
 impl<T, E: Error> Try for TracingResult<T, E> {
     type Output = T;
@@ -701,7 +705,7 @@ mod tests {
     #[test]
     fn ok_or_ok() {
         let good = io::Result::Ok(5).or_warn("should not log");
-        let v = good.ok();
+        let v = good.output();
         assert_eq!(v, Some(5));
         assert!(!logs_contain("should not log"));
     }

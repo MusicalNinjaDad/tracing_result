@@ -16,6 +16,7 @@ exclude = [
 ]
 
 [dependencies]
+try_v2 = { version = "0.11.0", default-features = false, features = ["traits"] }
 tracing = "0.1.44"
 
 [dev-dependencies]
