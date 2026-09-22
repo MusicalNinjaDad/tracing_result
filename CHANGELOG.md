@@ -1,5 +1,11 @@
 # tracing_result changelog
 
+## [v0.0.2]
+
+### New features
+
+- Provide extraction functions (`unwrap`, `ok`, `err`, etc.)
+
 ## [v0.0.1]
 
 ### New features

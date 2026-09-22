@@ -7,7 +7,7 @@ authors = ["Mike Foster <https://github.com/MusicalNinjaDad>"]
 repository = "https://github.com/MusicalNinjaDad/tracing_result"
 license = "MIT"
 edition = "2024"
-version = "0.0.1"
+version = "0.0.2"
 exclude = [
     "/.vibe/plans",
     "/.vibe/.tmp",
@@ -16,6 +16,7 @@ exclude = [
 ]
 
 [dependencies]
+try_v2 = { version = "0.11.0", default-features = false, features = ["traits"] }
 tracing = "0.1.44"
 
 [dev-dependencies]
