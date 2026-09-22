@@ -96,7 +96,7 @@ pub struct TracingConfig {
 ///     Ok(a / b)
 /// }
 /// ```
-pub enum TracingResult<T, E: Error> {
+pub enum TracingResult<T, E> {
     /// Success case containing the result value and optional tracing configuration.
     Ok {
         val: T,
@@ -113,7 +113,28 @@ pub enum TracingResult<T, E: Error> {
 }
 
 /// Calling any of the transform functions *will emit* the enclosed logs
-impl<T,E: Error> Extract<T> for TracingResult<T, E> {}
+impl<T, E: Error> Extract<T> for TracingResult<T, E> {}
+
+impl<T, E: Error> TracingResult<T, E> {
+    /// Converts from TracingResult<T, E> to Option<T>, emitting any tracing entry stored
+    /// in `Ok` variant (via `and_...()`) the process.
+    ///
+    /// Converts self into an Option<T>, consuming self, and converting the error to None, if any.
+    pub fn ok(self) -> Option<T> {
+        self.output()
+    }
+
+    /// Converts from TracingResult<T, E> to Option<E>, emitting any tracing  entry stored
+    /// in `Err` variant (via `or_...()`) the process.
+    ///
+    /// Converts self into an Option<E>, consuming self, and discarding the success value, if any.
+    pub fn err(self) -> Option<E> {
+        match self.branch() {
+            ControlFlow::Continue(_) => None,
+            ControlFlow::Break(TracingResult::Err { err, .. }) => Some(err),
+        }
+    }
+}
 
 impl<T, E: Error> Try for TracingResult<T, E> {
     type Output = T;
@@ -705,8 +726,35 @@ mod tests {
     #[test]
     fn ok_or_ok() {
         let good = io::Result::Ok(5).or_warn("should not log");
-        let v = good.output();
+        let v = good.ok();
         assert_eq!(v, Some(5));
+        assert!(!logs_contain("should not log"));
+    }
+
+    #[traced_test]
+    #[test]
+    fn ok_and_ok() {
+        let good = io::Result::Ok(5).and_warn("should log");
+        let v = good.ok();
+        assert_eq!(v, Some(5));
+        assert!(logs_contain("should log"));
+    }
+
+    #[traced_test]
+    #[test]
+    fn err_or_err() {
+        let err: TracingResult<i32, _> = Err(io::Error::other("oops")).or_warn("should log");
+        let v = err.err();
+        assert_eq!(v.map(|e| e.to_string()), Some("oops".to_string()));
+        assert!(logs_contain("should log"));
+    }
+
+    #[traced_test]
+    #[test]
+    fn err_and_err() {
+        let err: TracingResult<i32, _> = Err(io::Error::other("oops")).and_warn("should not log");
+        let v = err.err();
+        assert_eq!(v.map(|e| e.to_string()), Some("oops".to_string()));
         assert!(!logs_contain("should not log"));
     }
 }
