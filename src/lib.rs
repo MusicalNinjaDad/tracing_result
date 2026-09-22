@@ -695,4 +695,14 @@ mod tests {
         assert!(err().is_err());
         assert!(!logs_contain("should not log"));
     }
+
+    /// Tests that `ok` on an Ok(v) with no log entry returns Some(v) and does not emit.
+    #[traced_test]
+    #[test]
+    fn ok_or_ok() {
+        let good = io::Result::Ok(5).or_warn("should not log");
+        let v = good.ok();
+        assert_eq!(v, Some(5));
+        assert!(!logs_contain("should not log"));
+    }
 }
