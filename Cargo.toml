@@ -24,7 +24,7 @@ tracing-subscriber = { version = "0.3", features = ["fmt"] }
 tracing-test = "0.2.6"
 
 [build-dependencies]
-build_safely = "0.5.4"
+build_safely = "0.6.0"
 
 [workspace.metadata.ninja-xtask]
 env = { "LD_LIBRARY_PATH" = false }
