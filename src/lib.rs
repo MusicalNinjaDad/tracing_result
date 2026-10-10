@@ -54,6 +54,8 @@ use std::{
 use tracing::Level;
 use try_v2::Extract;
 
+use crate::TracingConfig::{OnOutput, OnResidual};
+
 /// Configuration for tracing log level and message.
 #[derive(Debug, Clone, Copy)]
 pub struct Event {
@@ -63,12 +65,38 @@ pub struct Event {
     pub message: &'static str,
 }
 
+impl Event {
+    fn emit(&self) {
+        match self.level {
+            Level::ERROR => tracing::error!("{}", self.message),
+            Level::WARN => tracing::warn!("{}", self.message),
+            Level::INFO => tracing::info!("{}", self.message),
+            Level::DEBUG => tracing::debug!("{}", self.message),
+            Level::TRACE => tracing::trace!("{}", self.message),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub enum TracingConfig {
     OnOutput(Event),
     OnResidual(Event),
     #[default]
     None,
+}
+
+impl TracingConfig {
+    fn emit_output(&self) {
+        if let OnOutput(event) = self {
+            event.emit();
+        }
+    }
+
+    fn emit_residual(&self) {
+        if let OnResidual(event) = self {
+            event.emit();
+        }
+    }
 }
 
 /// A result type that emits tracing messages at configurable log levels.
@@ -112,11 +140,23 @@ impl<T: Try> Try for Traced<T> {
     type Residual = T::Residual;
 
     fn from_output(output: Self::Output) -> Self {
-        todo!()
+        Self {
+            inner: Try::from_output(output),
+            event: Default::default(),
+        }
     }
 
     fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
-        todo!()
+        match self.inner.branch() {
+            ControlFlow::Continue(output) => {
+                self.event.emit_output();
+                ControlFlow::Continue(output)
+            }
+            ControlFlow::Break(residual) => {
+                self.event.emit_residual();
+                ControlFlow::Break(residual)
+            }
+        }
     }
 }
 
