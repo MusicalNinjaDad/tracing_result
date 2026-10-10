@@ -199,6 +199,7 @@ impl<T, E: Error> TracingResult<T, E> {
     }
 }
 
+// TODO: #23 update docs
 /// A trait for converting results into tracing results with custom log messages.
 ///
 /// This trait extends [`Result<T, E>`] with methods that attach custom messages at various
