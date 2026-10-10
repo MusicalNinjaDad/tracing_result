@@ -724,6 +724,18 @@ mod tests {
         assert!(!logs_contain("should not log"));
     }
 
+    #[test]
+    #[traced_test]
+    fn err_conversion() {
+        fn convert() -> Result<(), u32> {
+            let err: Result<(), u16> = Err(5);
+            err.or_error("conversion")?;
+            Ok(())
+        }
+        assert!(convert().is_err());
+        assert!(logs_contain("conversion"));
+    }
+
     #[traced_test]
     #[test]
     fn option() {
