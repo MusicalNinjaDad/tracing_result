@@ -49,26 +49,26 @@
 
 use std::{
     error::Error,
-    ops::{ControlFlow, FromResidual, Residual, Try},
+    ops::{ControlFlow, FromResidual, Try},
 };
 use tracing::Level;
 use try_v2::Extract;
 
 /// Configuration for tracing log level and message.
-///
-/// This struct holds the log level and message that will be emitted when a
-/// [`TracingResult`] is unpacked via the `?` operator.
-///
-/// # Fields
-///
-/// - `level`: The [`tracing::Level`] at which to log the message
-/// - `message`: The static string message to log
 #[derive(Debug, Clone, Copy)]
-pub struct TracingConfig {
+pub struct Event {
     /// The tracing level to use when logging.
     pub level: Level,
     /// The message to log.
     pub message: &'static str,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub enum TracingConfig {
+    OnOutput(Event),
+    OnResidual(Event),
+    #[default]
+    None,
 }
 
 /// A result type that emits tracing messages at configurable log levels.
@@ -267,7 +267,7 @@ impl<T, E: Error> Residual<T> for TracingResult<!, E> {
 ///     Ok(42)
 /// }
 /// ```
-pub trait Trace<T, E: Error> {
+pub trait Trace<T: Try> {
     /// Attaches a warning message to this result.
     ///
     /// Converts the [`Result`] into a [`TracingResult`] that will log the
@@ -285,7 +285,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "File read failed" will be logged
     /// ```
-    fn or_warn(self, name: &'static str) -> TracingResult<T, E>;
+    fn or_warn(self, name: &'static str) -> Traced<T>;
 
     /// Attaches a warning message to this result that logs when Ok is unpacked.
     ///
@@ -304,7 +304,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Unexpected success" will be logged
     /// ```
-    fn and_warn(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_warn(self, name: &'static str) -> Traced<T>;
 
     /// Attaches an error-level message to this result.
     ///
@@ -323,7 +323,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Critical failure" will be logged at ERROR level
     /// ```
-    fn or_error(self, name: &'static str) -> TracingResult<T, E>;
+    fn or_error(self, name: &'static str) -> Traced<T>;
 
     /// Attaches an error-level message to this result that logs when Ok is unpacked.
     ///
@@ -342,7 +342,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "This should not succeed" will be logged at ERROR level
     /// ```
-    fn and_error(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_error(self, name: &'static str) -> Traced<T>;
 
     /// Attaches a debug-level message to this result.
     ///
@@ -361,7 +361,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Debug: operation failed" will be logged at DEBUG level
     /// ```
-    fn or_debug(self, name: &'static str) -> TracingResult<T, E>;
+    fn or_debug(self, name: &'static str) -> Traced<T>;
 
     /// Attaches a debug-level message to this result that logs when Ok is unpacked.
     ///
@@ -380,7 +380,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Debug: operation succeeded" will be logged at DEBUG level
     /// ```
-    fn and_debug(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_debug(self, name: &'static str) -> Traced<T>;
 
     /// Attaches a trace-level message to this result.
     ///
@@ -399,7 +399,7 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Trace: minor issue detected" will be logged at TRACE level
     /// ```
-    fn or_trace(self, name: &'static str) -> TracingResult<T, E>;
+    fn or_trace(self, name: &'static str) -> Traced<T>;
 
     /// Attaches a trace-level message to this result that logs when Ok is unpacked.
     ///
@@ -418,33 +418,27 @@ pub trait Trace<T, E: Error> {
     ///
     /// // When tracing_result? is used, "Trace: operation completed" will be logged at TRACE level
     /// ```
-    fn and_trace(self, name: &'static str) -> TracingResult<T, E>;
+    fn and_trace(self, name: &'static str) -> Traced<T>;
 }
 
-impl<T, E: Error> Trace<T, E> for Result<T, E> {
-    fn or_warn(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok { val, config: None },
-            Err(err) => TracingResult::Err {
-                err,
-                config: Some(TracingConfig {
-                    level: Level::WARN,
-                    message: name,
-                }),
-            },
+impl<T: Try> Trace<T> for T {
+    fn or_warn(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnResidual(Event {
+                level: Level::WARN,
+                message: name,
+            }),
         }
     }
 
     fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok {
-                val,
-                config: Some(TracingConfig {
-                    level: Level::WARN,
-                    message: name,
-                }),
-            },
-            Err(err) => TracingResult::Err { err, config: None },
+        Traced {
+            inner: self,
+            event: TracingConfig::OnOutput(Event {
+                level: Level::WARN,
+                message: name,
+            }),
         }
     }
 
