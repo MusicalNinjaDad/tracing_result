@@ -172,9 +172,9 @@ impl<T: Try> FromResidual for Traced<T> {
 /// to the relevant variant.
 ///
 /// E.g.
-/// - `.unwrap()` will emit any entries stored on the `Ok` variant but *not* any entries stored
-///   on the `Err` variant.
-impl<T, E: Error> Extract<T> for TracingResult<T, E> {}
+/// - `.unwrap()` on a `Traced<Result<_,_>>` will emit any entries stored on the `Ok` variant
+///   but *not* any entries stored on the `Err` variant.
+impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
 
 impl<T, E: Error> TracingResult<T, E> {
     /// Converts from TracingResult<T, E> to Option<T>, emitting any tracing entry stored
