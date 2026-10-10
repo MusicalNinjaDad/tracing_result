@@ -96,20 +96,34 @@ pub struct TracingConfig {
 ///     Ok(a / b)
 /// }
 /// ```
-pub enum TracingResult<T, E> {
-    /// Success case containing the result value and optional tracing configuration.
-    Ok {
-        val: T,
-        config: Option<TracingConfig>,
-    },
-    /// Error case containing both the error and optional tracing configuration.
-    ///
-    /// If `config` is present, the message is logged at the specified level
-    /// when the error is propagated using the `?` operator.
-    Err {
-        err: E,
-        config: Option<TracingConfig>,
-    },
+pub type TracingResult<T, E> = Traced<Result<T, E>>;
+
+pub struct Traced<T>
+where
+    T: Try,
+{
+    inner: T,
+    event: TracingConfig,
+}
+
+impl<T: Try> Try for Traced<T> {
+    type Output = T::Output;
+
+    type Residual = T::Residual;
+
+    fn from_output(output: Self::Output) -> Self {
+        todo!()
+    }
+
+    fn branch(self) -> ControlFlow<Self::Residual, Self::Output> {
+        todo!()
+    }
+}
+
+impl<T: Try> FromResidual for Traced<T> {
+    fn from_residual(residual: <Self as Try>::Residual) -> Self {
+        todo!()
+    }
 }
 
 /// Calling any of the extract functions *will emit* the enclosed tracing entries related
@@ -136,11 +150,12 @@ impl<T, E: Error> TracingResult<T, E> {
     pub fn err(self) -> Option<E> {
         match self.branch() {
             ControlFlow::Continue(_) => None,
-            ControlFlow::Break(TracingResult::Err { err, .. }) => Some(err),
+            ControlFlow::Break(Result::Err(err)) => Some(err),
         }
     }
 }
 
+#[cfg(false)]
 impl<T, E: Error> Try for TracingResult<T, E> {
     type Output = T;
 
@@ -193,6 +208,7 @@ impl<T, E: Error> Try for TracingResult<T, E> {
 }
 
 /// TODO: #3 double emission
+#[cfg(false)]
 impl<T, E: Error> FromResidual for TracingResult<T, E> {
     fn from_residual(residual: <Self as Try>::Residual) -> Self {
         match residual {
@@ -202,6 +218,7 @@ impl<T, E: Error> FromResidual for TracingResult<T, E> {
     }
 }
 
+#[cfg(false)]
 impl<T, E: Error> FromResidual<TracingResult<!, E>> for Result<T, E> {
     fn from_residual(residual: TracingResult<!, E>) -> Self {
         match residual {
@@ -211,6 +228,7 @@ impl<T, E: Error> FromResidual<TracingResult<!, E>> for Result<T, E> {
     }
 }
 
+#[cfg(false)]
 impl<T, E: Error> Residual<T> for TracingResult<!, E> {
     type TryType = TracingResult<T, E>;
 }
