@@ -1,6 +1,5 @@
 #![cfg_attr(unstable_never_type, feature(never_type))]
 #![cfg_attr(unstable_try_trait_v2, feature(try_trait_v2))]
-#![cfg_attr(unstable_try_trait_v2_residual, feature(try_trait_v2_residual))]
 
 //! A library for ergonomic error handling with tracing support.
 //!
@@ -162,7 +161,10 @@ impl<T: Try> Try for Traced<T> {
 
 impl<T: Try> FromResidual for Traced<T> {
     fn from_residual(residual: <Self as Try>::Residual) -> Self {
-        todo!()
+        Self {
+            inner: FromResidual::from_residual(residual),
+            event: Default::default(),
+        }
     }
 }
 
