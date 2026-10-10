@@ -51,7 +51,7 @@ use std::{
     ops::{ControlFlow, FromResidual, Try},
 };
 use tracing::Level;
-use try_v2::Extract;
+use try_v2::{Extract, Transform};
 
 use crate::TracingConfig::{OnOutput, OnResidual};
 
@@ -175,6 +175,8 @@ impl<T: Try> FromResidual for Traced<T> {
 /// - `.unwrap()` on a `Traced<Result<_,_>>` will emit any entries stored on the `Ok` variant
 ///   but *not* any entries stored on the `Err` variant.
 impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
+
+impl<T, O> Transform<O> for Traced<T> where T: Try<Output = O> {}
 
 impl<T, E: Error> TracingResult<T, E> {
     /// Converts from TracingResult<T, E> to Option<T>, emitting any tracing entry stored
@@ -813,17 +815,15 @@ mod tests {
 
     #[traced_test]
     #[test]
-    #[cfg(false)]
     fn none_and_then() {
-        let _: usize = None.or_warn("wibble").and_then(|x| x += 1);
+        let _: Option<usize> = None.or_warn("wibble").and_then(|x| Some(x + 1));
         assert!(logs_contain("wibble"));
     }
 
     #[traced_test]
     #[test]
-    #[cfg(false)]
     fn some_and_then() {
-        let n = Some(4).or_warn("wibble").and_then(|x| x += 1);
+        let n = Some(4).or_warn("wibble").and_then(|x| Some(x + 1));
         assert_eq!(n, Some(5));
         assert!(!logs_contain("wibble"));
     }
