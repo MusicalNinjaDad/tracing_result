@@ -762,4 +762,31 @@ mod tests {
         assert_eq!(v.map(|e| e.to_string()), Some("oops".to_string()));
         assert!(!logs_contain("should not log"));
     }
+
+    #[traced_test]
+    #[test]
+    fn option() {
+        fn opt() -> Option<usize> {
+            let n = Some(5).or_warn("wibble")?;
+            Some(n)
+        }
+
+        assert_eq!(opt(), Some(5));
+        assert!(!logs_contain("wibble"));
+    }
+
+    #[traced_test]
+    #[test]
+    fn none_and_then() {
+        let _: usize = None.or_warn("wibble").and_then(|x| x += 1);
+        assert!(logs_contain("wibble"));
+    }
+
+    #[traced_test]
+    #[test]
+    fn some_and_then() {
+        let n = Some(4).or_warn("wibble").and_then(|x| x += 1);
+        assert_eq!(n, Some(5));
+        assert!(!logs_contain("wibble"));
+    }
 }
