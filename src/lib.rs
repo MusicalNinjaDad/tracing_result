@@ -35,8 +35,8 @@
 //!
 //! fn unexpected_success() -> io::Result<u32> {
 //!     // If Ok is returned, "Unexpected: computation succeeded" will be logged as a warning
-//!     Ok(42).and_warn("Unexpected: computation succeeded")?;
-//!     Ok(42)
+//!     let res = io::Result::Ok(42).and_warn("Unexpected: computation succeeded")?;
+//!     Ok(res)
 //! }
 //! ```
 //!
@@ -305,8 +305,8 @@ impl<T, E: Error> Residual<T> for TracingResult<!, E> {
 ///
 /// fn unexpected() -> io::Result<i32> {
 ///     // Logs "Unexpected success" at WARN level when Ok is unpacked
-///     Ok(42).and_warn("Unexpected success")?;
-///     Ok(42)
+///     let res = io::Result::Ok(42).and_warn("Unexpected success")?;
+///     Ok(res)
 /// }
 /// ```
 pub trait Trace<T: Try> {
@@ -558,7 +558,6 @@ mod tests {
     #[test]
     fn or_warn_ok() {
         fn no_error() -> io::Result<()> {
-            // TODO: Fix inferrence
             io::Result::Ok(()).or_warn("stuff")?;
             Ok(())
         }
