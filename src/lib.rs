@@ -432,7 +432,7 @@ impl<T: Try> Trace<T> for T {
         }
     }
 
-    fn and_warn(self, name: &'static str) -> TracingResult<T, E> {
+    fn and_warn(self, name: &'static str) -> Traced<T> {
         Traced {
             inner: self,
             event: TracingConfig::OnOutput(Event {
@@ -442,81 +442,63 @@ impl<T: Try> Trace<T> for T {
         }
     }
 
-    fn or_error(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok { val, config: None },
-            Err(err) => TracingResult::Err {
-                err,
-                config: Some(TracingConfig {
-                    level: Level::ERROR,
-                    message: name,
-                }),
-            },
+    fn or_error(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnResidual(Event {
+                level: Level::ERROR,
+                message: name,
+            }),
         }
     }
 
-    fn and_error(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok {
-                val,
-                config: Some(TracingConfig {
-                    level: Level::ERROR,
-                    message: name,
-                }),
-            },
-            Err(err) => TracingResult::Err { err, config: None },
+    fn and_error(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnOutput(Event {
+                level: Level::ERROR,
+                message: name,
+            }),
         }
     }
 
-    fn or_debug(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok { val, config: None },
-            Err(err) => TracingResult::Err {
-                err,
-                config: Some(TracingConfig {
-                    level: Level::DEBUG,
-                    message: name,
-                }),
-            },
+    fn or_debug(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnResidual(Event {
+                level: Level::DEBUG,
+                message: name,
+            }),
         }
     }
 
-    fn and_debug(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok {
-                val,
-                config: Some(TracingConfig {
-                    level: Level::DEBUG,
-                    message: name,
-                }),
-            },
-            Err(err) => TracingResult::Err { err, config: None },
+    fn and_debug(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnOutput(Event {
+                level: Level::DEBUG,
+                message: name,
+            }),
         }
     }
 
-    fn or_trace(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok { val, config: None },
-            Err(err) => TracingResult::Err {
-                err,
-                config: Some(TracingConfig {
-                    level: Level::TRACE,
-                    message: name,
-                }),
-            },
+    fn or_trace(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnResidual(Event {
+                level: Level::TRACE,
+                message: name,
+            }),
         }
     }
 
-    fn and_trace(self, name: &'static str) -> TracingResult<T, E> {
-        match self {
-            Ok(val) => TracingResult::Ok {
-                val,
-                config: Some(TracingConfig {
-                    level: Level::TRACE,
-                    message: name,
-                }),
-            },
-            Err(err) => TracingResult::Err { err, config: None },
+    fn and_trace(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnOutput(Event {
+                level: Level::TRACE,
+                message: name,
+            }),
         }
     }
 }
