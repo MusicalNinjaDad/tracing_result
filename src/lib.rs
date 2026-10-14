@@ -751,7 +751,9 @@ mod tests {
     #[traced_test]
     #[test]
     fn none_and_then() {
-        let _: Option<usize> = None.or_warn("wibble").and_then(|x| Some(x + 1));
+        let _: Option<usize> = Option::<usize>::None
+            .or_warn("wibble")
+            .and_then(|x| Some(x + 1));
         assert!(logs_contain("wibble"));
     }
 
