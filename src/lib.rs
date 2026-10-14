@@ -337,6 +337,12 @@ impl<T: Try> Try for Traced<T> {
     }
 }
 
+/// # Note
+///
+/// - The `Traced<T>` returned from ` try { Traced<T>? } ` will have no attached tracing
+///   events, as all will be emitted by the `?` inside the `try` block
+/// - `FromResidual` is primarily implemented as a formality, normal usage will likely be
+///   in the form `try bikeshed T { Traced<T>? }`
 impl<T: Try> FromResidual for Traced<T> {
     fn from_residual(residual: <Self as Try>::Residual) -> Self {
         Self {
