@@ -276,6 +276,7 @@ impl<T: Try> Trace<T> for T {
 
 /// The wrapper around a `Try`-type with associated tracing event. You will usually not
 /// interact directly with this type but rather with the trait [`Trace`].
+#[must_use = "The wrapped type may be an `Err`, `None`, or other `Residual` which requires handling."]
 pub struct Traced<T>
 where
     T: Try,

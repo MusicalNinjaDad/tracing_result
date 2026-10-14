@@ -11,6 +11,7 @@
 
 - added alias `TracedOption<T>`
 - added `or_info` & `and_info`
+- `Traced<T>` is `#[must_use]`
 
 ### Technical
 
