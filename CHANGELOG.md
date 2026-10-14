@@ -1,5 +1,21 @@
 # tracing_result changelog
 
+## [v0.1.0]
+
+### Breaking changes
+
+- renamed `TracingResult<T,E>` to `TracedResult<T,E>`
+- removed `Event` & `TracingConfig` from public API
+
+### New features
+
+- added alias `TracedOption<T>`
+- added `or_info` & `and_info`
+
+### Technical
+
+- improved docs
+
 ## [v0.0.3]
 
 ### New features
@@ -24,6 +40,4 @@
 
 ### Known issues / TODOs
 
-- [#5](https://github.com/MusicalNinjaDad/tracing_result/issues/5) allow chaining e.g. `.and_info("").or_warn("")?`
-- [#3](https://github.com/MusicalNinjaDad/tracing_result/issues/3) don't duplicate emissions when `?` inside a block returning `TracingResult`
 - [#1](https://github.com/MusicalNinjaDad/tracing_result/issues/1) provide details of actual callsite
