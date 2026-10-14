@@ -1,5 +1,19 @@
 # tracing_result changelog
 
+## [v0.1.0]
+
+### Breaking changes
+
+- renamed alias to `TracedResult<T,E>`
+
+### New features
+
+- added alias `TracedOption<T>`
+
+### Technical
+
+- improved docs
+
 ## [v0.0.3]
 
 ### New features
