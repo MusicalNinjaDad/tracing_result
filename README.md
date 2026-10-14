@@ -2,14 +2,14 @@
 
 A library for ergonomic error handling with tracing support.
 
-This crate provides a wrapper around [`Result`], [`Option`] & any other types
-which implement [`Try`] that automatically emits tracing messages at configurable log levels
+This crate provides a wrapper around `Result`, `Option` & any other types
+which implement `Try` that automatically emits tracing messages at configurable log levels
 when unpacked via the `?` operator.
 
 ## Overview
 
-The [`Trace`] trait extends all `Try`-types `T` with methods that wrap it in a [`Traced<T>`]
-with a custom tracing message. The message is emitted automatically when the [`Traced<T>`] is
+The `Trace` trait extends all `Try`-types `T` with methods that wrap it in a `Traced<T>`
+with a custom tracing message. The message is emitted automatically when the `Traced<T>` is
 used with the `?` operator.
 
 Simply `use tracing_result::Trace` to bring the methods into scope. The blanket implementation
@@ -17,12 +17,10 @@ ensures availability on all `Try`-types, not only `Result`& `Option`.
 
 There are two families of methods:
 
-- **`or_*` methods** ([`or_warn`][Trace::or_warn], [`or_error`][Trace::or_error],
-  [`or_debug`][Trace::or_debug], [`or_trace`][Trace::or_trace]): Log the message when an
+- **`or_*` methods** (`or_warn`, `or_error`, `or_debug`, `or_trace`): Log the message when an
   **`Err`**/**`None`** etc. is unpacked
-- **`and_*` methods** ([`and_warn`][Trace::and_warn], [`and_error`][Trace::and_error],
-  [`and_debug`][Trace::and_debug], [`and_trace`][Trace::and_debug]):
-  Log the message when an **`Ok`**/**`Some`** etc. is unpacked
+- **`and_*` methods** (`and_warn`, `and_error`, `and_debug`, `and_trace`): Log the message
+  when an **`Ok`**/**`Some`** etc. is unpacked
 
 ## Examples
 
