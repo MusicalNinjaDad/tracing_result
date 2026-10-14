@@ -80,11 +80,11 @@ use crate::TracingConfig::{OnOutput, OnResidual};
 
 /// Configuration for tracing log level and message.
 #[derive(Debug, Clone, Copy)]
-pub struct Event {
+struct Event {
     /// The tracing level to use when logging.
-    pub level: Level,
+    level: Level,
     /// The message to log.
-    pub message: &'static str,
+    message: &'static str,
 }
 
 impl Event {
@@ -100,7 +100,7 @@ impl Event {
 }
 
 #[derive(Debug, Clone, Copy, Default)]
-pub enum TracingConfig {
+enum TracingConfig {
     OnOutput(Event),
     OnResidual(Event),
     #[default]
