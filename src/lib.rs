@@ -124,6 +124,8 @@ impl TracingConfig {
 pub type TracedResult<T, E> = Traced<Result<T, E>>;
 pub type TracedOption<T> = Traced<Option<T>>;
 
+/// The wrapper around a `Try`-type with associated tracing event. You will usually not
+/// interact directly with this type but rather with the trait [`Trace`].
 pub struct Traced<T>
 where
     T: Try,
@@ -167,29 +169,21 @@ impl<T: Try> FromResidual for Traced<T> {
     }
 }
 
-/// Calling any of the extract functions *will emit* the enclosed tracing entries related
+/// Calling any of the extraction functions *will emit* the enclosed tracing entries related
 /// to the relevant variant.
-///
-/// E.g.
-/// - `.unwrap()` on a `Traced<Result<_,_>>` will emit any entries stored on the `Ok` variant
-///   but *not* any entries stored on the `Err` variant.
 impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
 
+/// Calling any of the transformation functions *will emit* the enclosed tracing entries related
+/// to the relevant variant.
 impl<T, O> Transform<O> for Traced<T> where T: Try<Output = O> {}
 
 impl<T, E> TracedResult<T, E> {
-    /// Converts from TracingResult<T, E> to Option<T>, emitting any tracing entry stored
-    /// in `Ok` variant (via `and_...()`) the process.
-    ///
-    /// Converts self into an Option<T>, consuming self, and converting the error to None, if any.
+    /// Converts from TracedResult<T, E> to Option<T>, emitting any tracing entry in the process.
     pub fn ok(self) -> Option<T> {
         self.output()
     }
 
-    /// Converts from TracingResult<T, E> to Option<E>, emitting any tracing  entry stored
-    /// in `Err` variant (via `or_...()`) the process.
-    ///
-    /// Converts self into an Option<E>, consuming self, and discarding the success value, if any.
+    /// Converts from TracedResult<T, E> to Option<E>, emitting any tracing entry in the process.
     pub fn err(self) -> Option<E> {
         match self.branch() {
             ControlFlow::Continue(_) => None,
@@ -198,192 +192,97 @@ impl<T, E> TracedResult<T, E> {
     }
 }
 
-// TODO: #23 update docs
-/// A trait for converting results into tracing results with custom log messages.
+/// The [`Trace`] trait extends all `Try`-types `T` with methods that wrap it in a [`Traced<T>`]
+/// with a custom tracing message. The message is emitted automatically when the [`Traced<T>`] is
+/// used with the `?` operator.
 ///
-/// This trait extends [`Result<T, E>`] with methods that attach custom messages at various
-/// log levels. When the resulting [`TracingResult`] is used with the `?` operator, the message
-/// will be automatically logged via the [`tracing`] macro corresponding to the chosen level.
+/// Simply `use tracing_result::Trace` to bring the methods into scope. The blanket implementation
+/// ensures availability on all `Try`-types, not only `Result`& `Option`.
 ///
-/// # Method Families
+/// There are two families of methods:
+/// - **`or_*` methods** ([`or_warn`][Trace::or_warn], [`or_error`][Trace::or_error],
+///   [`or_debug`][Trace::or_debug], [`or_trace`][Trace::or_trace]): Log the message when an
+///   **`Err`**/**`None`** etc. is unpacked
+/// - **`and_*` methods** ([`and_warn`][Trace::and_warn], [`and_error`][Trace::and_error],
+///   [`and_debug`][Trace::and_debug], [`and_trace`][Trace::and_debug]):
+///   Log the message when an **`Ok`**/**`Some`** etc. is unpacked
 ///
-/// - **`or_*`** (`or_warn`, `or_error`, `or_debug`, `or_trace`): Attach a message that logs when **Err** is unpacked
-/// - **`and_*`** (`and_warn`, `and_error`, `and_debug`, `and_trace`): Attach a message that logs when **Ok** is unpacked
+/// # Examples
 ///
-/// # Example
+/// ## `Traced<Result>`
 ///
 /// ```
 /// use std::io;
 /// use tracing_result::Trace;
 ///
-/// fn might_fail() -> io::Result<i32> {
-///     Err(io::Error::other("network error"))
+/// fn might_fail() -> io::Result<u32> {
+///     Err(io::Error::other("something went wrong"))
 /// }
 ///
-/// fn process() -> io::Result<i32> {
-///     // Logs "Failed to fetch data" at WARN level if might_fail() returns Err
-///     let result = might_fail().or_warn("Failed to fetch data");
-///     result?;
+/// fn compute() -> io::Result<u32> {
+///     // If might_fail() returns Err, "Failed to compute value" will be logged as a warning
+///     might_fail().or_warn("Failed to compute value")?;
 ///     Ok(42)
 /// }
 ///
-/// fn unexpected() -> io::Result<i32> {
-///     // Logs "Unexpected success" at WARN level when Ok is unpacked
-///     let res = io::Result::Ok(42).and_warn("Unexpected success")?;
+/// fn unexpected_success() -> io::Result<u32> {
+///     // If Ok is returned, "Unexpected: computation succeeded" will be logged as a warning
+///     let res = io::Result::Ok(42).and_warn("Unexpected: computation succeeded")?;
 ///     Ok(res)
 /// }
 /// ```
+///
+/// ## `Traced<Option>`
+///
+/// ```
+/// use tracing_result::Trace;
+/// use try_v2::{Extract, Transform};
+///
+/// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// struct Data {
+///     value: Option<i32>,
+/// }
+///
+/// let data: Vec<Data> = Vec::new();
+///
+/// let first_value = data
+///     .first()
+///     .or_warn("No entries found") // Emitted if `None`
+///     .and_then(|d| d.value) // `Transform` methods call `Try::branch` and therefore emit
+///     .or_warn("No value in first entry") // Emitted if `None`
+///     .unwrap_or_default(); // `Extract` methods call `Try::branch` and therefore emit
+///
+/// assert_eq!(first_value, 0);
+/// ```
 pub trait Trace<T: Try> {
-    /// Attaches a warning message to this result.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::warn`] if an error occurs and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Err(io::Error::other("io error"));
-    /// let tracing_result = result.or_warn("File read failed");
-    ///
-    /// // When tracing_result? is used, "File read failed" will be logged
-    /// ```
+    /// Attaches a warning message to the `Residual` case.
     fn or_warn(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches a warning message to this result that logs when Ok is unpacked.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::warn`] if the result is [`Ok`] and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Ok(42);
-    /// let tracing_result = result.and_warn("Unexpected success");
-    ///
-    /// // When tracing_result? is used, "Unexpected success" will be logged
-    /// ```
+    /// Attaches a warning message to the `Output` case.
     fn and_warn(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches an error-level message to this result.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::error`] if an error occurs and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Err(io::Error::other("io error"));
-    /// let tracing_result = result.or_error("Critical failure");
-    ///
-    /// // When tracing_result? is used, "Critical failure" will be logged at ERROR level
-    /// ```
+    /// Attaches an error-level message to the `Residual` case.
     fn or_error(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches an error-level message to this result that logs when Ok is unpacked.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::error`] if the result is [`Ok`] and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Ok(42);
-    /// let tracing_result = result.and_error("This should not succeed");
-    ///
-    /// // When tracing_result? is used, "This should not succeed" will be logged at ERROR level
-    /// ```
+    /// Attaches an error-level message to the `Output`case.
     fn and_error(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches a debug-level message to this result.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::debug`] if an error occurs and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Err(io::Error::other("io error"));
-    /// let tracing_result = result.or_debug("Debug: operation failed");
-    ///
-    /// // When tracing_result? is used, "Debug: operation failed" will be logged at DEBUG level
-    /// ```
+    /// Attaches a debug message to the `Residual` case.
     fn or_debug(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches a debug-level message to this result that logs when Ok is unpacked.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::debug`] if the result is [`Ok`] and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Ok(42);
-    /// let tracing_result = result.and_debug("Debug: operation succeeded");
-    ///
-    /// // When tracing_result? is used, "Debug: operation succeeded" will be logged at DEBUG level
-    /// ```
+    /// Attaches a debug message to the `Output` case.
     fn and_debug(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches a trace-level message to this result.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::trace`] if an error occurs and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Err(io::Error::other("io error"));
-    /// let tracing_result = result.or_trace("Trace: minor issue detected");
-    ///
-    /// // When tracing_result? is used, "Trace: minor issue detected" will be logged at TRACE level
-    /// ```
+    /// Attaches an info message to the `Residual` case.
+    fn or_info(self, name: &'static str) -> Traced<T>;
+
+    /// Attaches an info message to the `Output` case.
+    fn and_info(self, name: &'static str) -> Traced<T>;
+
+    /// Attaches a trace-level message to the `Residual` case.
     fn or_trace(self, name: &'static str) -> Traced<T>;
 
-    /// Attaches a trace-level message to this result that logs when Ok is unpacked.
-    ///
-    /// Converts the [`Result`] into a [`TracingResult`] that will log the
-    /// provided message via [`tracing::trace`] if the result is [`Ok`] and is
-    /// propagated with the `?` operator.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::io;
-    /// use tracing_result::Trace;
-    ///
-    /// let result: io::Result<i32> = Ok(42);
-    /// let tracing_result = result.and_trace("Trace: operation completed");
-    ///
-    /// // When tracing_result? is used, "Trace: operation completed" will be logged at TRACE level
-    /// ```
+    /// Attaches a trace-level message to the `Output` case.
     fn and_trace(self, name: &'static str) -> Traced<T>;
 }
 
@@ -467,6 +366,16 @@ impl<T: Try> Trace<T> for T {
             }),
         }
     }
+    
+    fn or_info(self, name: &'static str) -> Traced<T> {
+        todo!()
+    }
+    
+    fn and_info(self, name: &'static str) -> Traced<T> {
+        todo!()
+    }
+
+    
 }
 
 #[cfg(test)]
