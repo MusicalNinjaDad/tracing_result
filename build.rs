@@ -1,7 +1,7 @@
 use build_safely::prelude::*;
 
 fn main() -> Result<()> {
-    let ac = AutoCfg::new()?;
+    let mut ac = AutoCfg::new()?;
 
     // check to see any  downstream crate has defined
     // `unstable.allow-features` in `.cargo/config.toml`.

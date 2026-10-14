@@ -9,13 +9,13 @@ fn main() -> io::Result<()> {
     registry().with(stdout).init();
 
     let _span = error_span!("pretty examples").entered();
-    Ok(42).and_warn("This will log a WARN on success")?;
+    io::Result::Ok(42).and_warn("This will log a WARN on success")?;
 
-    Ok(42).and_error("This will log an ERROR on success")?;
+    io::Result::Ok(42).and_error("This will log an ERROR on success")?;
 
-    Ok(42).and_debug("This will log a DEBUG on success")?;
+    io::Result::Ok(42).and_debug("This will log a DEBUG on success")?;
 
-    Ok(42).and_trace("This will log a TRACE on success")?;
+    io::Result::Ok(42).and_trace("This will log a TRACE on success")?;
 
     // Only the first uncommented one of these triggers
     Err(io::Error::other("Oopsie")).or_warn("This will log a WARN on error")?;
