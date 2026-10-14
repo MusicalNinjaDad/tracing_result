@@ -4,11 +4,13 @@
 
 ### Breaking changes
 
-- renamed alias to `TracedResult<T,E>`
+- renamed `TracingResult<T,E>` to `TracedResult<T,E>`
+- removed `Event` & `TracingConfig` from public API
 
 ### New features
 
 - added alias `TracedOption<T>`
+- added `or_info` & `and_info`
 
 ### Technical
 
