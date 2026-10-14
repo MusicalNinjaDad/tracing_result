@@ -347,6 +347,26 @@ impl<T: Try> Trace<T> for T {
         }
     }
 
+    fn or_info(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnResidual(Event {
+                level: Level::INFO,
+                message: name,
+            }),
+        }
+    }
+
+    fn and_info(self, name: &'static str) -> Traced<T> {
+        Traced {
+            inner: self,
+            event: TracingConfig::OnOutput(Event {
+                level: Level::INFO,
+                message: name,
+            }),
+        }
+    }
+
     fn or_trace(self, name: &'static str) -> Traced<T> {
         Traced {
             inner: self,
@@ -366,16 +386,6 @@ impl<T: Try> Trace<T> for T {
             }),
         }
     }
-    
-    fn or_info(self, name: &'static str) -> Traced<T> {
-        todo!()
-    }
-    
-    fn and_info(self, name: &'static str) -> Traced<T> {
-        todo!()
-    }
-
-    
 }
 
 #[cfg(test)]
