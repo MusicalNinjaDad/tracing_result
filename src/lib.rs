@@ -178,12 +178,12 @@ impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
 impl<T, O> Transform<O> for Traced<T> where T: Try<Output = O> {}
 
 impl<T, E> TracedResult<T, E> {
-    /// Converts from TracedResult<T, E> to Option<T>, emitting any tracing entry in the process.
+    /// Converts from `TracedResult<T, E>` to `Option<T>`, emitting any tracing entry in the process.
     pub fn ok(self) -> Option<T> {
         self.output()
     }
 
-    /// Converts from TracedResult<T, E> to Option<E>, emitting any tracing entry in the process.
+    /// Converts from `TracedResult<T, E>` to `Option<E>`, emitting any tracing entry in the process.
     pub fn err(self) -> Option<E> {
         match self.branch() {
             ControlFlow::Continue(_) => None,
