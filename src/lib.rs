@@ -763,4 +763,16 @@ mod tests {
         assert_eq!(n, Some(5));
         assert!(!logs_contain("wibble"));
     }
+
+    #[traced_test]
+    #[test]
+    fn chain() {
+        fn chained() -> Option<usize> {
+            let n = Some(4).or_warn("empty").and_debug("full")?;
+            Some(n + 1)
+        }
+        assert_eq!(chained(), Some(5));
+        assert!(logs_contain("full"));
+        assert!(!logs_contain("empty"));
+    }
 }
