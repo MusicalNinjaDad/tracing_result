@@ -72,10 +72,7 @@
 //! assert_eq!(first_value, 0);
 //! ```
 
-use std::{
-    error::Error,
-    ops::{ControlFlow, FromResidual, Try},
-};
+use std::ops::{ControlFlow, FromResidual, Try};
 use tracing::Level;
 use try_v2::{Extract, Transform};
 
@@ -124,32 +121,8 @@ impl TracingConfig {
     }
 }
 
-/// A result type that emits tracing messages at configurable log levels.
-///
-/// [`TracingResult`] acts like the standard [`Result`] type, adding the ability to
-/// associate a custom message that is logged when the result is unpacked via the `?` operator.
-/// The log level (ERROR, WARN, INFO, DEBUG, or TRACE) is determined by which [`Trace`] trait
-/// method was used to construct it.
-///
-/// It is usually constructed via methods from the [`Trace`] trait and rarely returned
-/// directly - `?` will work in a block which returns [`Result`].
-///
-/// # Example
-///
-/// ```
-/// use std::io;
-/// use tracing_result::{Trace, TracingResult};
-///
-/// fn divide(a: i32, b: i32) -> io::Result<i32> {
-///     if b == 0 {
-///         let oops: TracingResult<_, _> = Err(io::Error::other("division by zero"))
-///             .or_warn("Cannot divide by zero");
-///         oops?;
-///     }
-///     Ok(a / b)
-/// }
-/// ```
-pub type TracingResult<T, E> = Traced<Result<T, E>>;
+pub type TracedResult<T, E> = Traced<Result<T, E>>;
+pub type TracedOption<T> = Traced<Option<T>>;
 
 pub struct Traced<T>
 where
@@ -204,7 +177,7 @@ impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
 
 impl<T, O> Transform<O> for Traced<T> where T: Try<Output = O> {}
 
-impl<T, E: Error> TracingResult<T, E> {
+impl<T, E> TracedResult<T, E> {
     /// Converts from TracingResult<T, E> to Option<T>, emitting any tracing entry stored
     /// in `Ok` variant (via `and_...()`) the process.
     ///
@@ -735,7 +708,7 @@ mod tests {
     #[traced_test]
     #[test]
     fn err_or_err() {
-        let err: TracingResult<i32, _> = Err(io::Error::other("oops")).or_warn("should log");
+        let err: TracedResult<i32, _> = Err(io::Error::other("oops")).or_warn("should log");
         let v = err.err();
         assert_eq!(v.map(|e| e.to_string()), Some("oops".to_string()));
         assert!(logs_contain("should log"));
@@ -744,7 +717,7 @@ mod tests {
     #[traced_test]
     #[test]
     fn err_and_err() {
-        let err: TracingResult<i32, _> = Err(io::Error::other("oops")).and_warn("should not log");
+        let err: TracedResult<i32, _> = Err(io::Error::other("oops")).and_warn("should not log");
         let v = err.err();
         assert_eq!(v.map(|e| e.to_string()), Some("oops".to_string()));
         assert!(!logs_contain("should not log"));
