@@ -17,9 +17,9 @@ ensures availability on all `Try`-types, not only `Result`& `Option`.
 
 There are two families of methods:
 
-- **`or_*` methods** (`or_warn`, `or_error`, `or_debug`, `or_trace`): Log the message when an
+- **`or_*` methods** (`or_error`, `or_warn`, `or_info`, `or_debug`, `or_trace`): Log the message when an
   **`Err`**/**`None`** etc. is unpacked
-- **`and_*` methods** (`and_warn`, `and_error`, `and_debug`, `and_trace`): Log the message
+- **`and_*` methods** (`and_error`, `and_warn`, `and_info`, `and_debug`, `and_trace`): Log the message
   when an **`Ok`**/**`Some`** etc. is unpacked
 
 ## Examples
