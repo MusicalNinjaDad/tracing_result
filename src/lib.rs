@@ -293,7 +293,7 @@ impl<T, O> Extract<O> for Traced<T> where T: Try<Output = O> {}
 impl<T, O> Transform<O> for Traced<T> where T: Try<Output = O> {}
 
 /// # Note
-/// 
+///
 /// - Any attached events are emitted when `branch` is called and all wrappings are
 ///   removed, leaving either the `Output` or `Resdiual` of the wrapped `Try`-type.
 ///   For example: using `?` on a `Traced<Traced<Option<T>>>` will result in either a
